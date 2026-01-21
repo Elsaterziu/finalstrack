@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FinalsTrack.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinalsTrack.Api.Data
 {
@@ -8,7 +9,18 @@ namespace FinalsTrack.Api.Data
             : base(options)
         {
         }
+        public DbSet<User> Users => Set<User>();
+        public DbSet<Role> Roles => Set<Role>();
+        public DbSet<UserRole> UserRoles => Set<UserRole>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
-       
-    }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserRole>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            base.OnModelCreating(modelBuilder);
+
+            }
+        }
 }
