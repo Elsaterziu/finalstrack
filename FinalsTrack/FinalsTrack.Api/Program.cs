@@ -1,4 +1,6 @@
 using FinalsTrack.Api.Data;
+using FinalsTrack.Api.Services.Interfaces;
+using FinalsTrack.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -48,6 +50,14 @@ builder.Services.AddDbContext<FinalsTrackDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
+
+// Application Services (Business Logic)
+builder.Services.AddScoped<IExamSeasonService, ExamSeasonService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IExamService, ExamService>();
+builder.Services.AddScoped<IStudyBlockService, StudyBlockService>();
+builder.Services.AddScoped<IStressLogService, StressLogService>();
+
 
 // JWT CONFIGURATION
 
