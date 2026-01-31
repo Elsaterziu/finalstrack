@@ -1,32 +1,30 @@
-﻿using FinalsTrack.Api.Data;
-using FinalsTrack.Api.Dtos;
+﻿using FinalsTrack.Api.Dtos;
 using FinalsTrack.Api.Models;
+using FinalsTrack.Api.Repositories.Interfaces;
 using FinalsTrack.Api.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace FinalsTrack.Api.Services;
 
 public class StudyBlockService : IStudyBlockService
 {
-    private readonly FinalsTrackDbContext _context;
+    private readonly IStudyBlockRepository _repository;
 
-    public StudyBlockService(FinalsTrackDbContext context)
+    public StudyBlockService(IStudyBlockRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<IEnumerable<StudyBlockDto>> GetByExamAsync(int examId)
     {
-        return await _context.StudyBlocks
-            .Where(sb => sb.ExamId == examId)
-            .Select(sb => new StudyBlockDto
-            {
-                Id = sb.Id,
-                ExamId = sb.ExamId,
-                StudyDate = sb.StudyDate,
-                DurationMinutes = sb.DurationMinutes
-            })
-            .ToListAsync();
+        var blocks = await _repository.GetByExamAsync(examId);
+
+        return blocks.Select(sb => new StudyBlockDto
+        {
+            Id = sb.Id,
+            ExamId = sb.ExamId,
+            StudyDate = sb.StudyDate,
+            DurationMinutes = sb.DurationMinutes
+        });
     }
 
     public async Task<StudyBlockDto> CreateAsync(CreateStudyBlockDto dto)
@@ -39,8 +37,7 @@ public class StudyBlockService : IStudyBlockService
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.StudyBlocks.Add(block);
-        await _context.SaveChangesAsync();
+        await _repository.AddAsync(block);
 
         return new StudyBlockDto
         {
@@ -53,10 +50,9 @@ public class StudyBlockService : IStudyBlockService
 
     public async Task DeleteAsync(int id)
     {
-        var block = await _context.StudyBlocks.FindAsync(id);
+        var block = await _repository.GetByIdAsync(id);
         if (block == null) return;
 
-        _context.StudyBlocks.Remove(block);
-        await _context.SaveChangesAsync();
+        await _repository.DeleteAsync(block);
     }
 }

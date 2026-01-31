@@ -6,6 +6,6 @@ public interface IExamSeasonService
 {
     Task<IEnumerable<ExamSeasonDto>> GetAllAsync();
     Task<ExamSeasonDto> GetByIdAsync(int id);
-    Task<ExamSeasonDto> CreateAsync(CreateExamSeasonDto dto);
+    Task<ExamSeasonDto> CreateAsync(CreateExamSeasonDto dto, int userId);
     Task DeleteAsync(int id);
 }

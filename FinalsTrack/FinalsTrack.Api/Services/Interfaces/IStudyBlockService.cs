@@ -1,5 +1,4 @@
 ﻿using FinalsTrack.Api.Dtos;
-using FinalsTrack.Api.DTOs;
 
 namespace FinalsTrack.Api.Services.Interfaces;
 

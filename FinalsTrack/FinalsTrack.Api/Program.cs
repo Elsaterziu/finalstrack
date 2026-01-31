@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using FinalsTrack.Api.Repositories.Interfaces;
+using FinalsTrack.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +59,14 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IStudyBlockService, StudyBlockService>();
 builder.Services.AddScoped<IStressLogService, StressLogService>();
+
+
+// Repositories
+builder.Services.AddScoped<IExamSeasonRepository, ExamSeasonRepository>();
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<IExamRepository, ExamRepository>();
+builder.Services.AddScoped<IStudyBlockRepository, StudyBlockRepository>();
+builder.Services.AddScoped<IStressLogRepository, StressLogRepository>();
 
 
 // JWT CONFIGURATION

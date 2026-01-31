@@ -6,6 +6,6 @@ public interface ISubjectService
 {
     Task<IEnumerable<SubjectDto>> GetAllAsync();
     Task<SubjectDto> GetByIdAsync(int id);
-    Task<SubjectDto> CreateAsync(CreateSubjectDto dto);
+    Task<SubjectDto> CreateAsync(CreateSubjectDto dto, int userId);
     Task DeleteAsync(int id);
 }

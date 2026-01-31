@@ -1,34 +1,33 @@
-﻿using FinalsTrack.Api.Data;
-using FinalsTrack.Api.Dtos;
+﻿using FinalsTrack.Api.Dtos;
 using FinalsTrack.Api.Models;
+using FinalsTrack.Api.Repositories.Interfaces;
 using FinalsTrack.Api.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace FinalsTrack.Api.Services;
 
 public class SubjectService : ISubjectService
 {
-    private readonly FinalsTrackDbContext _context;
+    private readonly ISubjectRepository _repository;
 
-    public SubjectService(FinalsTrackDbContext context)
+    public SubjectService(ISubjectRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<IEnumerable<SubjectDto>> GetAllAsync()
     {
-        return await _context.Subjects
-            .Select(s => new SubjectDto
-            {
-                Id = s.Id,
-                Name = s.Name
-            })
-            .ToListAsync();
+        var subjects = await _repository.GetAllAsync();
+
+        return subjects.Select(s => new SubjectDto
+        {
+            Id = s.Id,
+            Name = s.Name
+        });
     }
 
-    public async Task<SubjectDto> GetByIdAsync(int id)
+    public async Task<SubjectDto?> GetByIdAsync(int id)
     {
-        var subject = await _context.Subjects.FindAsync(id);
+        var subject = await _repository.GetByIdAsync(id);
         if (subject == null) return null;
 
         return new SubjectDto
@@ -38,15 +37,15 @@ public class SubjectService : ISubjectService
         };
     }
 
-    public async Task<SubjectDto> CreateAsync(CreateSubjectDto dto)
+    public async Task<SubjectDto> CreateAsync(CreateSubjectDto dto, int userId)
     {
         var subject = new Subject
         {
-            Name = dto.Name
+            Name = dto.Name,
+            UserId = userId
         };
 
-        _context.Subjects.Add(subject);
-        await _context.SaveChangesAsync();
+        await _repository.AddAsync(subject);
 
         return new SubjectDto
         {
@@ -57,10 +56,9 @@ public class SubjectService : ISubjectService
 
     public async Task DeleteAsync(int id)
     {
-        var subject = await _context.Subjects.FindAsync(id);
+        var subject = await _repository.GetByIdAsync(id);
         if (subject == null) return;
 
-        _context.Subjects.Remove(subject);
-        await _context.SaveChangesAsync();
+        await _repository.DeleteAsync(subject);
     }
 }

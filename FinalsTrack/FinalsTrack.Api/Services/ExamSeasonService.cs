@@ -1,36 +1,35 @@
-﻿using FinalsTrack.Api.Data;
-using FinalsTrack.Api.Dtos;
+﻿using FinalsTrack.Api.Dtos;
 using FinalsTrack.Api.Models;
+using FinalsTrack.Api.Repositories.Interfaces;
 using FinalsTrack.Api.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace FinalsTrack.Api.Services;
 
 public class ExamSeasonService : IExamSeasonService
 {
-    private readonly FinalsTrackDbContext _context;
+    private readonly IExamSeasonRepository _repository;
 
-    public ExamSeasonService(FinalsTrackDbContext context)
+    public ExamSeasonService(IExamSeasonRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<IEnumerable<ExamSeasonDto>> GetAllAsync()
     {
-        return await _context.ExamSeasons
-            .Select(es => new ExamSeasonDto
-            {
-                Id = es.Id,
-                Title = es.Title,
-                StartDate = es.StartDate,
-                EndDate = es.EndDate
-            })
-            .ToListAsync();
+        var seasons = await _repository.GetAllAsync();
+
+        return seasons.Select(es => new ExamSeasonDto
+        {
+            Id = es.Id,
+            Title = es.Title,
+            StartDate = es.StartDate,
+            EndDate = es.EndDate
+        });
     }
 
-    public async Task<ExamSeasonDto> GetByIdAsync(int id)
+    public async Task<ExamSeasonDto?> GetByIdAsync(int id)
     {
-        var season = await _context.ExamSeasons.FindAsync(id);
+        var season = await _repository.GetByIdAsync(id);
         if (season == null) return null;
 
         return new ExamSeasonDto
@@ -42,18 +41,18 @@ public class ExamSeasonService : IExamSeasonService
         };
     }
 
-    public async Task<ExamSeasonDto> CreateAsync(CreateExamSeasonDto dto)
+    public async Task<ExamSeasonDto> CreateAsync(CreateExamSeasonDto dto, int userId)
     {
         var season = new ExamSeason
         {
             Title = dto.Title,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
+            UserId = userId,
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.ExamSeasons.Add(season);
-        await _context.SaveChangesAsync();
+        await _repository.AddAsync(season);
 
         return new ExamSeasonDto
         {
@@ -64,12 +63,12 @@ public class ExamSeasonService : IExamSeasonService
         };
     }
 
+
     public async Task DeleteAsync(int id)
     {
-        var season = await _context.ExamSeasons.FindAsync(id);
+        var season = await _repository.GetByIdAsync(id);
         if (season == null) return;
 
-        _context.ExamSeasons.Remove(season);
-        await _context.SaveChangesAsync();
+        await _repository.DeleteAsync(season);
     }
 }
