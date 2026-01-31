@@ -1,17 +1,40 @@
 using FinalsTrack.Api.Data;
-using FinalsTrack.Api.Services.Interfaces;
+using FinalsTrack.Api.Repositories;
+using FinalsTrack.Api.Repositories.Interfaces;
 using FinalsTrack.Api.Services;
+using FinalsTrack.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using FinalsTrack.Api.Repositories.Interfaces;
-using FinalsTrack.Api.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// SERVICES
+// Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IExamSeasonRepository, ExamSeasonRepository>();
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<IExamRepository, ExamRepository>();
+builder.Services.AddScoped<IStudyBlockRepository, StudyBlockRepository>();
+builder.Services.AddScoped<IStressLogRepository, StressLogRepository>();
+
+// Application Services (Business Logic)
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<IExamSeasonService, ExamSeasonService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IExamService, ExamService>();
+builder.Services.AddScoped<IStudyBlockService, StudyBlockService>();
+builder.Services.AddScoped<IStressLogService, StressLogService>();
+
+
 
 // Controllers
 builder.Services.AddControllers();
@@ -52,21 +75,6 @@ builder.Services.AddDbContext<FinalsTrackDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
-
-// Application Services (Business Logic)
-builder.Services.AddScoped<IExamSeasonService, ExamSeasonService>();
-builder.Services.AddScoped<ISubjectService, SubjectService>();
-builder.Services.AddScoped<IExamService, ExamService>();
-builder.Services.AddScoped<IStudyBlockService, StudyBlockService>();
-builder.Services.AddScoped<IStressLogService, StressLogService>();
-
-
-// Repositories
-builder.Services.AddScoped<IExamSeasonRepository, ExamSeasonRepository>();
-builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
-builder.Services.AddScoped<IExamRepository, ExamRepository>();
-builder.Services.AddScoped<IStudyBlockRepository, StudyBlockRepository>();
-builder.Services.AddScoped<IStressLogRepository, StressLogRepository>();
 
 
 // JWT CONFIGURATION
