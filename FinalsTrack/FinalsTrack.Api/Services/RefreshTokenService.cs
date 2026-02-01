@@ -32,9 +32,14 @@ namespace FinalsTrack.Api.Services
         {
             var stored = await _repo.GetByTokenAsync(token);
 
-            if (stored == null) return null;
-            if (stored.IsRevoked) return null;
-            if (stored.ExpiresAt <= DateTime.UtcNow) return null;
+            if (stored == null)
+                return null;
+
+            if (stored.IsRevoked == true)
+                return null;
+
+            if (stored.ExpiresAt <= DateTime.UtcNow)
+                return null;
 
             return stored;
         }

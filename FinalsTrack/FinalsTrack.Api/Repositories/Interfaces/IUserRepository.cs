@@ -7,7 +7,11 @@ namespace FinalsTrack.Api.Repositories.Interfaces
         Task<User?> GetByIdAsync(int id);
         Task<User?> GetByEmailAsync(string email);
         Task<List<User>> GetAllAsync();
+
         Task AddAsync(User user);
+        void Update(User user);
+        void Delete(User user);
+
         Task<int> SaveChangesAsync();
     }
 }

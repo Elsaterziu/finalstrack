@@ -16,6 +16,9 @@ namespace FinalsTrack.Api.Services
         public async Task<User?> GetByEmailAsync(string email)
             => await _users.GetByEmailAsync(email);
 
+        public async Task<User?> GetByIdAsync(int id)
+            => await _users.GetByIdAsync(id);
+
         public async Task<User> CreateAsync(string fullName, string email, string password)
         {
             var existing = await _users.GetByEmailAsync(email);
@@ -24,8 +27,8 @@ namespace FinalsTrack.Api.Services
 
             var user = new User
             {
-                FullName = fullName,
-                Email = email,
+                FullName = fullName.Trim(),
+                Email = email.Trim(),
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
             };
 
@@ -41,5 +44,54 @@ namespace FinalsTrack.Api.Services
 
             return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
         }
+
+        public async Task<bool> UpdateMeAsync(int userId, string fullName)
+        {
+            var user = await _users.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            user.FullName = fullName.Trim();
+            _users.Update(user);
+            await _users.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            var user = await _users.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            var ok = BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash);
+            if (!ok) return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _users.Update(user);
+            await _users.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<User>> GetAllAsync()
+            => await _users.GetAllAsync();
+
+        public async Task<bool> DeleteAsync(int userId)
+        {
+            var user = await _users.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            _users.Delete(user);
+            await _users.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> SetActiveStatusAsync(int userId, bool isActive)
+        {
+            var user = await _users.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            user.IsActive = isActive;
+            _users.Update(user);
+            await _users.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

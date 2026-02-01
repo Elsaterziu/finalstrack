@@ -60,6 +60,9 @@ namespace FinalsTrack.Api.Controllers
             if (user == null)
                 return Unauthorized("Invalid credentials");
 
+            if (user.IsActive == false)
+                return Unauthorized("Account is deactivated");
+
             var valid = await _userService.ValidatePasswordAsync(dto.Email, dto.Password);
             if (!valid)
                 return Unauthorized("Invalid credentials");
@@ -77,6 +80,7 @@ namespace FinalsTrack.Api.Controllers
                 RefreshToken = refreshToken
             });
         }
+
 
         // ================= REFRESH =================
         [HttpPost("refresh")]
