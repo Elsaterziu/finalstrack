@@ -7,5 +7,6 @@ public interface IExamSeasonRepository
     Task<List<ExamSeason>> GetAllAsync();
     Task<ExamSeason?> GetByIdAsync(int id);
     Task AddAsync(ExamSeason entity);
+    Task UpdateAsync(ExamSeason entity);
     Task DeleteAsync(ExamSeason entity);
 }

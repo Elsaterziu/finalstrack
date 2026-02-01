@@ -6,7 +6,6 @@ using System.Security.Claims;
 
 namespace FinalsTrack.Api.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/subjects")]
 public class SubjectsController : ControllerBase
@@ -18,12 +17,16 @@ public class SubjectsController : ControllerBase
         _service = service;
     }
 
+    
+    [Authorize(Roles = "Professor,Student")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
     }
 
+    
+    [Authorize(Roles = "Professor,Student")]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -31,19 +34,32 @@ public class SubjectsController : ControllerBase
         return result == null ? NotFound() : Ok(result);
     }
 
+    
+    [Authorize(Roles = "Professor")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateSubjectDto dto)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userIdClaim == null)
-            return Unauthorized();
-
-        int userId = int.Parse(userIdClaim);
+        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         var created = await _service.CreateAsync(dto, userId);
         return Ok(created);
     }
 
+    
+    [Authorize(Roles = "Professor")]
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateSubjectDto dto)
+    {
+        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var updated = await _service.UpdateAsync(id, dto, userId);
+        if (updated == null) return NotFound();
+
+        return Ok(updated);
+    }
+
+    
+    [Authorize(Roles = "Professor")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -8,7 +8,7 @@ namespace FinalsTrack.Api.Controllers;
 
 [ApiController]
 [Route("api/exam-seasons")]
-[Authorize]
+[Authorize(Roles = "Student")]
 public class ExamSeasonsController : ControllerBase
 {
     private readonly IExamSeasonService _service;
@@ -34,18 +34,22 @@ public class ExamSeasonsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateExamSeasonDto dto)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null)
-            return Unauthorized("Invalid or missing token");
-
-        int userId = int.Parse(userIdClaim);
+        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         var created = await _service.CreateAsync(dto, userId);
-
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateExamSeasonDto dto)
+    {
+        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var updated = await _service.UpdateAsync(id, dto, userId);
+        if (updated == null) return NotFound();
+
+        return Ok(updated);
+    }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
@@ -54,4 +58,3 @@ public class ExamSeasonsController : ControllerBase
         return NoContent();
     }
 }
-

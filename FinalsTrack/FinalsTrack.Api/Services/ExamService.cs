@@ -45,8 +45,16 @@ public class ExamService : IExamService
         };
     }
 
-    public async Task<ExamDto> CreateAsync(CreateExamDto dto)
+    public async Task<ExamDto> CreateAsync(CreateExamDto dto, int userId)
     {
+        // get exam season to check ownership
+        var examSeason = await _repository.GetExamSeasonAsync(dto.ExamSeasonId);
+        if (examSeason == null)
+            throw new InvalidOperationException("Exam season not found");
+
+        if (examSeason.UserId != userId)
+            throw new UnauthorizedAccessException();
+
         var exam = new Exam
         {
             ExamSeasonId = dto.ExamSeasonId,
@@ -70,6 +78,33 @@ public class ExamService : IExamService
             ExamTime = created.ExamTime
         };
     }
+
+    public async Task<ExamDto?> UpdateAsync(int id, UpdateExamDto dto, int userId)
+    {
+        var exam = await _repository.GetByIdAsync(id);
+        if (exam == null) return null;
+
+        // ownership check
+        if (exam.ExamSeason.UserId != userId)
+            throw new UnauthorizedAccessException();
+
+        exam.SubjectId = dto.SubjectId;
+        exam.ExamDate = dto.ExamDate;
+        exam.ExamTime = dto.ExamTime;
+
+        await _repository.UpdateAsync(exam);
+
+        return new ExamDto
+        {
+            Id = exam.Id,
+            ExamSeasonId = exam.ExamSeasonId,
+            SubjectId = exam.SubjectId,
+            SubjectName = exam.Subject.Name,
+            ExamDate = exam.ExamDate,
+            ExamTime = exam.ExamTime
+        };
+    }
+
 
     public async Task DeleteAsync(int id)
     {

@@ -37,6 +37,27 @@ public class SubjectService : ISubjectService
         };
     }
 
+    public async Task<SubjectDto?> UpdateAsync(int id, UpdateSubjectDto dto, int userId)
+    {
+        var subject = await _repository.GetByIdAsync(id);
+        if (subject == null) return null;
+
+        // ownership check
+        if (subject.UserId != userId)
+            throw new UnauthorizedAccessException();
+
+        subject.Name = dto.Name;
+
+        await _repository.UpdateAsync(subject);
+
+        return new SubjectDto
+        {
+            Id = subject.Id,
+            Name = subject.Name
+        };
+    }
+
+
     public async Task<SubjectDto> CreateAsync(CreateSubjectDto dto, int userId)
     {
         var subject = new Subject

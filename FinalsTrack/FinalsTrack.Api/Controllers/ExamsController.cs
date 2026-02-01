@@ -2,12 +2,12 @@
 using FinalsTrack.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FinalsTrack.Api.Controllers;
 
 [ApiController]
 [Route("api/exams")]
-[Authorize]
 public class ExamsController : ControllerBase
 {
     private readonly IExamService _service;
@@ -17,12 +17,16 @@ public class ExamsController : ControllerBase
         _service = service;
     }
 
+    
+    [Authorize(Roles = "Professor,Student")]
     [HttpGet("season/{examSeasonId:int}")]
     public async Task<IActionResult> GetBySeason(int examSeasonId)
     {
         return Ok(await _service.GetByExamSeasonAsync(examSeasonId));
     }
 
+    
+    [Authorize(Roles = "Professor,Student")]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -30,12 +34,32 @@ public class ExamsController : ControllerBase
         return result == null ? NotFound() : Ok(result);
     }
 
+    
+    [Authorize(Roles = "Professor")]
     [HttpPost]
-    public async Task<IActionResult> Create(CreateExamDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateExamDto dto)
     {
-        return Ok(await _service.CreateAsync(dto));
+        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var created = await _service.CreateAsync(dto, userId);
+        return Ok(created);
     }
 
+    
+    [Authorize(Roles = "Professor")]
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateExamDto dto)
+    {
+        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var updated = await _service.UpdateAsync(id, dto, userId);
+        if (updated == null) return NotFound();
+
+        return Ok(updated);
+    }
+
+    
+    [Authorize(Roles = "Professor")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

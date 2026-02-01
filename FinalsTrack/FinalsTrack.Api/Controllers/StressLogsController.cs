@@ -1,13 +1,14 @@
 ﻿using FinalsTrack.Api.Dtos;
-using FinalsTrack.Api.Models;
 using FinalsTrack.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-[Authorize]
+namespace FinalsTrack.Api.Controllers;
+
 [ApiController]
 [Route("api/stress-logs")]
+[Authorize(Roles = "Student")]
 public class StressLogsController : ControllerBase
 {
     private readonly IStressLogService _service;
@@ -26,11 +27,7 @@ public class StressLogsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateStressLogDto dto)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userIdClaim == null)
-            return Unauthorized();
-
-        int userId = int.Parse(userIdClaim);
+        int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         var created = await _service.CreateAsync(dto, userId);
         return Ok(created);

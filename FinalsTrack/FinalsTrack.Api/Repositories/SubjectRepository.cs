@@ -25,6 +25,11 @@ public class SubjectRepository : ISubjectRepository
         _context.Subjects.Add(entity);
         await _context.SaveChangesAsync();
     }
+    public async Task UpdateAsync(Subject entity)
+    {
+        _context.Subjects.Update(entity);
+        await _context.SaveChangesAsync();
+    }
 
     public async Task DeleteAsync(Subject entity)
     {

@@ -7,7 +7,7 @@ namespace FinalsTrack.Api.Controllers;
 
 [ApiController]
 [Route("api/study-blocks")]
-[Authorize]
+[Authorize(Roles = "Student")]
 public class StudyBlocksController : ControllerBase
 {
     private readonly IStudyBlockService _service;
@@ -24,7 +24,7 @@ public class StudyBlocksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateStudyBlockDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateStudyBlockDto dto)
     {
         return Ok(await _service.CreateAsync(dto));
     }

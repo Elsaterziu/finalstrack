@@ -63,6 +63,31 @@ public class ExamSeasonService : IExamSeasonService
         };
     }
 
+    public async Task<ExamSeasonDto?> UpdateAsync(int id, UpdateExamSeasonDto dto, int userId)
+    {
+        var season = await _repository.GetByIdAsync(id);
+        if (season == null) return null;
+
+        // ownership check
+        if (season.UserId != userId)
+            throw new UnauthorizedAccessException();
+
+        season.Title = dto.Title;
+        season.StartDate = dto.StartDate;
+        season.EndDate = dto.EndDate;
+
+        await _repository.UpdateAsync(season);
+
+        return new ExamSeasonDto
+        {
+            Id = season.Id,
+            Title = season.Title,
+            StartDate = season.StartDate,
+            EndDate = season.EndDate
+        };
+    }
+
+
 
     public async Task DeleteAsync(int id)
     {

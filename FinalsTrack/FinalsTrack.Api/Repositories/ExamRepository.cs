@@ -20,14 +20,27 @@ public class ExamRepository : IExamRepository
             .Where(e => e.ExamSeasonId == examSeasonId)
             .ToListAsync();
 
+    public async Task<ExamSeason?> GetExamSeasonAsync(int examSeasonId)
+    {
+        return await _context.ExamSeasons
+            .FirstOrDefaultAsync(es => es.Id == examSeasonId);
+    }
+
     public async Task<Exam?> GetByIdAsync(int id)
         => await _context.Exams
             .Include(e => e.Subject)
+            .Include(e => e.ExamSeason)   
             .FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task AddAsync(Exam entity)
     {
         _context.Exams.Add(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Exam exam)
+    {
+        _context.Exams.Update(exam);
         await _context.SaveChangesAsync();
     }
 

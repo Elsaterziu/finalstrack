@@ -26,6 +26,13 @@ public class ExamSeasonRepository : IExamSeasonRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task UpdateAsync(ExamSeason entity)
+    {
+        _context.ExamSeasons.Update(entity);
+        await _context.SaveChangesAsync();
+    }
+
+
     public async Task DeleteAsync(ExamSeason entity)
     {
         _context.ExamSeasons.Remove(entity);
