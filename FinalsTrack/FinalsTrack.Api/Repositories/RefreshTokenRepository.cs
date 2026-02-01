@@ -15,15 +15,20 @@ namespace FinalsTrack.Api.Repositories
         }
 
         public async Task AddAsync(RefreshToken token)
-            => await _context.RefreshTokens.AddAsync(token);
+        {
+            await _context.RefreshTokens.AddAsync(token);
+        }
 
-        public async Task<RefreshToken?> GetValidAsync(string token)
-            => await _context.RefreshTokens.FirstOrDefaultAsync(rt =>
-                rt.Token == token &&
-                rt.IsRevoked == false &&
-                rt.ExpiresAt > DateTime.UtcNow);
+        public async Task<RefreshToken?> GetByTokenAsync(string token)
+        {
+            return await _context.RefreshTokens
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Token == token);
+        }
 
-        public async Task<int> SaveChangesAsync()
-            => await _context.SaveChangesAsync();
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

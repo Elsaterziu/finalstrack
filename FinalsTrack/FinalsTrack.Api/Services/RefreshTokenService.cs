@@ -6,29 +6,48 @@ namespace FinalsTrack.Api.Services
 {
     public class RefreshTokenService : IRefreshTokenService
     {
-        private readonly IRefreshTokenRepository _refreshTokens;
+        private readonly IRefreshTokenRepository _repo;
 
-        public RefreshTokenService(IRefreshTokenRepository refreshTokens)
+        public RefreshTokenService(IRefreshTokenRepository repo)
         {
-            _refreshTokens = refreshTokens;
+            _repo = repo;
         }
 
-        public async Task<RefreshToken> CreateAsync(int userId, string token, DateTime expiresAt)
+        public async Task CreateAsync(int userId, string token, DateTime expiresAt)
         {
-            var rt = new RefreshToken
+            var entity = new RefreshToken
             {
                 UserId = userId,
                 Token = token,
                 ExpiresAt = expiresAt,
-                IsRevoked = false
+                IsRevoked = false,
+                CreatedAt = DateTime.UtcNow
             };
 
-            await _refreshTokens.AddAsync(rt);
-            await _refreshTokens.SaveChangesAsync();
-            return rt;
+            await _repo.AddAsync(entity);
+            await _repo.SaveChangesAsync();
         }
 
         public async Task<RefreshToken?> ValidateAsync(string token)
-            => await _refreshTokens.GetValidAsync(token);
+        {
+            var stored = await _repo.GetByTokenAsync(token);
+
+            if (stored == null) return null;
+            if (stored.IsRevoked) return null;
+            if (stored.ExpiresAt <= DateTime.UtcNow) return null;
+
+            return stored;
+        }
+
+        public async Task RevokeAsync(string token)
+        {
+            var stored = await _repo.GetByTokenAsync(token);
+            if (stored == null) return;
+
+            stored.IsRevoked = true;
+            stored.RevokedAt = DateTime.UtcNow;
+
+            await _repo.SaveChangesAsync();
+        }
     }
 }

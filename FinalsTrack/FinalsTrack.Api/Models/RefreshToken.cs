@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace FinalsTrack.Api.Models;
-
-public partial class RefreshToken
+﻿namespace FinalsTrack.Api.Models
 {
-    public int Id { get; set; }
+    public class RefreshToken
+    {
+        public int Id { get; set; }
 
-    public int UserId { get; set; }
+        public int UserId { get; set; }
+        public string Token { get; set; } = null!;
 
-    public string Token { get; set; }
+        public DateTime ExpiresAt { get; set; }
+        public bool IsRevoked { get; set; } = false;
 
-    public DateTime ExpiresAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? RevokedAt { get; set; }
 
-    public bool? IsRevoked { get; set; }
-
-    public virtual User User { get; set; }
+        public virtual User User { get; set; } = null!;
+    }
 }

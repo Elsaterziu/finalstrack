@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Repositories
@@ -33,8 +32,6 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IStudyBlockService, StudyBlockService>();
 builder.Services.AddScoped<IStressLogService, StressLogService>();
-
-
 
 // Controllers
 builder.Services.AddControllers();
@@ -76,9 +73,7 @@ builder.Services.AddDbContext<FinalsTrackDbContext>(options =>
     )
 );
 
-
 // JWT CONFIGURATION
-
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
 
@@ -105,7 +100,6 @@ builder.Services.AddAuthentication(options =>
 var app = builder.Build();
 
 // MIDDLEWARE
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

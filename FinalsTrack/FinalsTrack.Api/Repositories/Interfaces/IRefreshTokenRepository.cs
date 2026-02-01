@@ -5,7 +5,7 @@ namespace FinalsTrack.Api.Repositories.Interfaces
     public interface IRefreshTokenRepository
     {
         Task AddAsync(RefreshToken token);
-        Task<RefreshToken?> GetValidAsync(string token);
-        Task<int> SaveChangesAsync();
+        Task<RefreshToken?> GetByTokenAsync(string token);
+        Task SaveChangesAsync();
     }
 }
