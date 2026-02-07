@@ -11,5 +11,6 @@ export default function AdminOnlyRoute({ children }) {
   const roles = user?.roles || [];
   const isAdmin = roles.includes("Admin");
 
-  return isAdmin ? children : <Navigate to="/dashboard" replace />;
+  return isAdmin ? children : <Navigate to="/student" replace />;
+
 }

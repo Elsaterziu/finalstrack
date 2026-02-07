@@ -1,34 +1,42 @@
-import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 
 import AuthPage from "./pages/AuthPage";
-import Dashboard from "./pages/Dashboard";
 import AdminUsers from "./pages/AdminUsers";
+import StudentDashboard from "./pages/student/Dashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminOnlyRoute from "./components/AdminOnlyRoute";
+
 import AdminLayout from "./admin/AdminLayout";
+import StudentLayout from "./layouts/StudentLayout";
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+
           {/* AUTH */}
           <Route path="/auth" element={<AuthPage />} />
 
-          {/* USER DASHBOARD */}
+          {/* STUDENT AREA */}
           <Route
-            path="/dashboard"
+            path="/student"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <StudentLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<StudentDashboard />} />
+            <Route path="exams" element={<div>Exams page (next)</div>} />
+            <Route path="subjects" element={<div>Subjects page (next)</div>} />
+            <Route path="study-blocks" element={<div>Study Blocks page (next)</div>} />
+            <Route path="stress-logs" element={<div>Stress Logs page (next)</div>} />
+          </Route>
 
-          {/* ADMIN */}
+          {/* ADMIN AREA */}
           <Route
             path="/admin"
             element={
@@ -47,6 +55,7 @@ export default function App() {
 
           {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/auth" replace />} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

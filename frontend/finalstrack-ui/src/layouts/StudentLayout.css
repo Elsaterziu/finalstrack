@@ -1,0 +1,74 @@
+.student-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* SIDEBAR */
+.student-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1f2933, #111827);
+  color: #fff;
+  padding: 20px 15px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+/* BRAND */
+.sidebar-brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  letter-spacing: 0.5px;
+}
+
+/* NAV */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* LINK */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateX(4px);
+}
+
+/* ACTIVE */
+.sidebar-link.active {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+/* ICON */
+.sidebar-icon {
+  font-size: 1.1rem;
+}
+
+/* MAIN CONTENT */
+.student-content {
+  margin-left: 240px;
+  padding: 30px;
+  width: calc(100% - 240px);
+}

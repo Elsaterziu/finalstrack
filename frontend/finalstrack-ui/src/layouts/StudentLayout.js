@@ -1,42 +1,50 @@
-import { Outlet, Link } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
+import {
+  FaTachometerAlt,
+  FaBook,
+  FaLayerGroup,
+  FaClock,
+  FaHeartbeat
+} from "react-icons/fa";
 
-const StudentLayout = () => {
+import "./StudentLayout.css";
+
+export default function StudentLayout() {
   return (
-    <div className="container-fluid">
-      <div className="row">
+    <div className="student-layout">
+      {/* SIDEBAR */}
+      <aside className="student-sidebar">
+        <div className="sidebar-brand">
+          FinalsTrack
+        </div>
 
-        {/* Sidebar */}
-        <nav className="col-md-2 d-none d-md-block bg-dark text-white min-vh-100">
-          <div className="pt-3">
-            <h5 className="text-center">FinalsTrack</h5>
-            <ul className="nav flex-column mt-4">
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/student">Dashboard</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/student/exams">Exams</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/student/subjects">Subjects</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/student/study-blocks">Study Blocks</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link text-white" to="/student/stress-logs">Stress Logs</Link>
-              </li>
-            </ul>
-          </div>
+        <nav className="sidebar-nav">
+          <NavItem to="/student" icon={<FaTachometerAlt />} label="Dashboard" />
+          <NavItem to="/student/exams" icon={<FaBook />} label="Exams" />
+          <NavItem to="/student/subjects" icon={<FaLayerGroup />} label="Subjects" />
+          <NavItem to="/student/study-blocks" icon={<FaClock />} label="Study Blocks" />
+          <NavItem to="/student/stress-logs" icon={<FaHeartbeat />} label="Stress Logs" />
         </nav>
+      </aside>
 
-        {/* Main content */}
-        <main className="col-md-10 ms-sm-auto px-4 py-4">
-          <Outlet />
-        </main>
-
-      </div>
+      {/* MAIN CONTENT */}
+      <main className="student-content">
+        <Outlet />
+      </main>
     </div>
   );
-};
+}
 
-export default StudentLayout;
+/* SMALL HELPER */
+const NavItem = ({ to, icon, label }) => (
+  <NavLink
+    to={to}
+    end
+    className={({ isActive }) =>
+      `sidebar-link ${isActive ? "active" : ""}`
+    }
+  >
+    <span className="sidebar-icon">{icon}</span>
+    <span>{label}</span>
+  </NavLink>
+);

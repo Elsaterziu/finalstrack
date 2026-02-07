@@ -1,7 +1,7 @@
 import apiClient from "./apiClient";
 
 export const getExamSeasons = () =>
-  apiClient.get("/exam-seasons");
+  apiClient.get("/api/exam-seasons");
 
 export const getExamSeasonById = (id) =>
-  apiClient.get(`/exam-seasons/${id}`);
+  apiClient.get(`/api/exam-seasons/${id}`);

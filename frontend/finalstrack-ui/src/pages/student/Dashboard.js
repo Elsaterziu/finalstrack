@@ -1,14 +1,29 @@
 import { useEffect, useState } from "react";
+import {
+  FaCalendarAlt,
+  FaClock,
+  FaBook,
+  FaBrain,
+  FaHourglassHalf
+} from "react-icons/fa";
+
 import { getExamSeasons } from "../../api/examSeasonsApi";
 import { getExamsBySeason } from "../../api/examsApi";
 import { getStudyBlocksByExam } from "../../api/studyBlocksApi";
 import { getStressLogsByExam } from "../../api/stressLogsApi";
 
+import StressChart from "../../components/charts/StressChart";
+import StudyTimeChart from "../../components/charts/StudyTimeChart";
+
+import "./dashboard.css";
+
 const Dashboard = () => {
   const [activeSeason, setActiveSeason] = useState(null);
   const [exams, setExams] = useState([]);
   const [nextExam, setNextExam] = useState(null);
+
   const [totalStudyMinutes, setTotalStudyMinutes] = useState(0);
+  const [stressLogs, setStressLogs] = useState([]);
   const [avgStress, setAvgStress] = useState(null);
   const [countdown, setCountdown] = useState(null);
 
@@ -16,182 +31,150 @@ const Dashboard = () => {
     loadDashboard();
   }, []);
 
-  // Load dashboard data from backend
   const loadDashboard = async () => {
     try {
-      const seasons = (await getExamSeasons()).data;
       const today = new Date();
+      const seasons = (await getExamSeasons()).data;
 
-      // Find active season (date-based)
       const active = seasons.find(
-        (s) =>
-          new Date(s.startDate) <= today &&
-          new Date(s.endDate) >= today
+        s => new Date(s.startDate) <= today && new Date(s.endDate) >= today
       );
 
       if (!active) return;
       setActiveSeason(active);
 
-      // Load exams for active season
       const examsData = (await getExamsBySeason(active.id)).data;
-      setExams(examsData);
 
-      // Find next upcoming exam
       const upcoming = examsData
-        .map((e) => ({
+        .map(e => ({
           ...e,
-          fullDate: new Date(`${e.examDate}T${e.examTime}`),
+          fullDate: new Date(`${e.examDate}T${e.examTime}`)
         }))
-        .filter((e) => e.fullDate > today)
+        .filter(e => e.fullDate > today)
         .sort((a, b) => a.fullDate - b.fullDate);
 
-      if (upcoming.length > 0) {
-        setNextExam(upcoming[0]);
-      }
+      setNextExam(upcoming[0] ?? null);
 
-      // Aggregate study blocks & stress logs
-      let studyMinutes = 0;
+      let totalMinutes = 0;
       let stressSum = 0;
       let stressCount = 0;
+      let allLogs = [];
 
       for (const exam of examsData) {
         const blocks = (await getStudyBlocksByExam(exam.id)).data;
-        studyMinutes += blocks.reduce(
-          (sum, b) => sum + b.durationMinutes,
-          0
-        );
+        const examMinutes = blocks.reduce((s, b) => s + b.durationMinutes, 0);
+        exam.totalStudyMinutes = examMinutes;
+        totalMinutes += examMinutes;
 
         const logs = (await getStressLogsByExam(exam.id)).data;
-        const examStressSum = logs.reduce(
-          (sum, l) => sum + l.stressLevel,
-          0
-        );
+        allLogs.push(...logs);
 
-        stressSum += examStressSum;
+        stressSum += logs.reduce((s, l) => s + l.stressLevel, 0);
         stressCount += logs.length;
       }
 
-      setTotalStudyMinutes(studyMinutes);
-      setAvgStress(
-        stressCount > 0 ? (stressSum / stressCount).toFixed(1) : null
-      );
+      setExams([...examsData]);
+      setStressLogs(allLogs);
+      setTotalStudyMinutes(totalMinutes);
+      setAvgStress(stressCount ? (stressSum / stressCount).toFixed(1) : null);
     } catch (err) {
       console.error("Dashboard load failed:", err);
     }
   };
 
-  // Countdown logic (updates every second)
+  /* COUNTDOWN */
   useEffect(() => {
     if (!nextExam) return;
 
-    const interval = setInterval(() => {
-      const now = new Date();
-      const examDateTime = new Date(
-        `${nextExam.examDate}T${nextExam.examTime}`
-      );
-
-      const diff = examDateTime - now;
+    const timer = setInterval(() => {
+      const diff =
+        new Date(`${nextExam.examDate}T${nextExam.examTime}`) - new Date();
 
       if (diff <= 0) {
         setCountdown(null);
-        clearInterval(interval);
+        clearInterval(timer);
         return;
       }
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-
-      setCountdown({ days, hours, minutes, seconds });
+      setCountdown({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60)
+      });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, [nextExam]);
 
   return (
-    <div>
-      <h2 className="mb-4">Student Dashboard</h2>
+    <div className="dashboard-page">
+      <h2 className="dashboard-title">Student Dashboard</h2>
 
       {!activeSeason && (
-        <div className="alert alert-warning">
-          No active exam season
-        </div>
+        <div className="alert alert-warning">No active exam season</div>
       )}
 
       {activeSeason && (
         <>
-          <p className="text-muted">
+          <p className="dashboard-subtitle">
             Active Season: <strong>{activeSeason.title}</strong>
           </p>
 
+          {/* STATS */}
+          <div className="row g-4 mb-4">
+            <StatCard icon={<FaCalendarAlt />} title="Upcoming Exams" value={exams.length} />
+            <StatCard
+              icon={<FaBook />}
+              title="Next Exam"
+              value={nextExam?.subjectName ?? "—"}
+              sub={`${nextExam?.examDate ?? ""} ${nextExam?.examTime ?? ""}`}
+            />
+            <StatCard
+              icon={<FaHourglassHalf />}
+              title="Countdown"
+              value={
+                countdown
+                  ? `${countdown.days}d ${countdown.hours}h`
+                  : "—"
+              }
+              sub={countdown ? `${countdown.minutes}m remaining` : ""}
+            />
+            <StatCard
+              icon={<FaClock />}
+              title="Study Time"
+              value={`${totalStudyMinutes} min`}
+            />
+            <StatCard
+              icon={<FaBrain />}
+              title="Avg Stress"
+              value={avgStress ?? "-"}
+              danger={avgStress >= 7}
+            />
+          </div>
+
+          {/* CHARTS */}
           <div className="row g-4">
-            {/* Upcoming Exams */}
-            <div className="col-md-6 col-lg-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="text-muted">Upcoming Exams</h6>
-                  <h3>{exams.length}</h3>
-                </div>
-              </div>
-            </div>
-
-            {/* Next Exam */}
-            <div className="col-md-6 col-lg-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="text-muted">Next Exam</h6>
-                  {nextExam ? (
-                    <>
-                      <strong>{nextExam.subjectName}</strong>
-                      <div className="small text-muted">
-                        {nextExam.examDate} {nextExam.examTime}
-                      </div>
-                    </>
-                  ) : (
-                    <span className="text-muted">None</span>
+            <div className="col-md-6">
+              <div className="dashboard-card">
+                <h5>Stress Over Time</h5>
+                <StressChart logs={stressLogs} />
+                <div className="chart-footer">
+                  Avg stress: <b>{avgStress}/10</b>
+                  {avgStress >= 7 && (
+                    <span className="stress-warning">
+                      ⚠️ High stress detected
+                    </span>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Countdown */}
-            <div className="col-md-6 col-lg-3">
-              <div className="card shadow-sm border-primary">
-                <div className="card-body">
-                  <h6 className="text-muted">Exam Countdown</h6>
-                  {countdown ? (
-                    <>
-                      <strong className="fs-5">
-                        {countdown.days}d {countdown.hours}h
-                      </strong>
-                      <div className="small text-muted">
-                        {countdown.minutes}m {countdown.seconds}s remaining
-                      </div>
-                    </>
-                  ) : (
-                    <span className="text-muted">No upcoming exam</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Study Time */}
-            <div className="col-md-6 col-lg-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="text-muted">Study Time</h6>
-                  <h3>{totalStudyMinutes} min</h3>
-                </div>
-              </div>
-            </div>
-
-            {/* Stress */}
-            <div className="col-md-6 col-lg-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="text-muted">Avg Stress</h6>
-                  <h3>{avgStress ?? "-"}</h3>
+            <div className="col-md-6">
+              <div className="dashboard-card">
+                <h5>Study Time per Exam</h5>
+                <StudyTimeChart exams={exams} />
+                <div className="chart-footer">
+                  Total accumulated study time per exam
                 </div>
               </div>
             </div>
@@ -201,5 +184,18 @@ const Dashboard = () => {
     </div>
   );
 };
+
+const StatCard = ({ icon, title, value, sub, danger }) => (
+  <div className="col-md-6 col-lg-3">
+    <div className={`stat-card ${danger ? "stat-danger" : ""}`}>
+      <div className="stat-icon">{icon}</div>
+      <div>
+        <div className="stat-title">{title}</div>
+        <div className="stat-value">{value}</div>
+        {sub && <div className="stat-sub">{sub}</div>}
+      </div>
+    </div>
+  </div>
+);
 
 export default Dashboard;
