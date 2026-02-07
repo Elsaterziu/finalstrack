@@ -54,8 +54,22 @@ namespace FinalsTrack.Api.Controllers
             var ok = await _userService.UpdateMeAsync(userId, dto.FullName);
             if (!ok) return NotFound();
 
-            return Ok("Profile updated");
+            var user = await _userService.GetByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            var roles = await _userRoleService.GetUserRolesAsync(userId);
+
+            return Ok(new UserResponseDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                CreatedAt = user.CreatedAt,
+                Roles = roles,
+                IsActive = user.IsActive
+            });
         }
+
 
         // ===================== CHANGE PASSWORD =====================
         [Authorize]

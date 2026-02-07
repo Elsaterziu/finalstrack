@@ -1,22 +1,79 @@
 import axios from "axios";
+import { tokenStorage } from "../auth/tokenStorage";
 
-const apiClient = axios.create({
-  baseURL: "https://localhost:7092/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+const api = axios.create({
+  baseURL: "https://localhost:7092",
+  headers: { "Content-Type": "application/json" },
 });
 
-// Attach JWT automatically
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use((config) => {
+  const access = tokenStorage.getAccess();
+  if (access) config.headers.Authorization = `Bearer ${access}`;
+  return config;
+});
+
+let isRefreshing = false;
+let queue = [];
+
+function resolveQueue(error, token = null) {
+  queue.forEach((p) => {
+    if (error) p.reject(error);
+    else p.resolve(token);
+  });
+  queue = [];
+}
+
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const original = error.config;
+
+    // nëse s’ka response (p.sh. CORS/SSL), ktheje siç është
+    if (!error.response) return Promise.reject(error);
+
+    const status = error.response.status;
+    const refresh = tokenStorage.getRefresh();
+
+    // mos u fut në loop në refresh/login/register
+    const isAuthEndpoint =
+      original.url?.includes("/api/auth/login") ||
+      original.url?.includes("/api/auth/register") ||
+      original.url?.includes("/api/auth/refresh");
+
+    if (status === 401 && !original._retry && refresh && !isAuthEndpoint) {
+      original._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          queue.push({ resolve, reject });
+        }).then((newToken) => {
+          original.headers.Authorization = `Bearer ${newToken}`;
+          return api(original);
+        });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const resp = await api.post("/api/auth/refresh", { refreshToken: refresh });
+        const newAccess = resp.data?.accessToken;
+
+        tokenStorage.setTokens({ accessToken: newAccess, refreshToken: refresh });
+
+        resolveQueue(null, newAccess);
+        original.headers.Authorization = `Bearer ${newAccess}`;
+        return api(original);
+      } catch (err) {
+        resolveQueue(err, null);
+        tokenStorage.clear();
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
+
+    return Promise.reject(error);
+  }
 );
 
-export default apiClient;
+export default api;

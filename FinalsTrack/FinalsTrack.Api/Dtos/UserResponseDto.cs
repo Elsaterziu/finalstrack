@@ -7,5 +7,7 @@
         public string Email { get; set; } = null!;
         public DateTime? CreatedAt { get; set; }
         public List<string> Roles { get; set; } = new();
+        public bool IsActive { get; set; }
+
     }
 }
