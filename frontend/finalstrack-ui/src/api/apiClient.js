@@ -28,13 +28,11 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    // nëse s’ka response (p.sh. CORS/SSL), ktheje siç është
     if (!error.response) return Promise.reject(error);
 
     const status = error.response.status;
     const refresh = tokenStorage.getRefresh();
 
-    // mos u fut në loop në refresh/login/register
     const isAuthEndpoint =
       original.url?.includes("/api/auth/login") ||
       original.url?.includes("/api/auth/register") ||
@@ -57,8 +55,9 @@ api.interceptors.response.use(
       try {
         const resp = await api.post("/api/auth/refresh", { refreshToken: refresh });
         const newAccess = resp.data?.accessToken;
+        const newRefresh = resp.data?.refreshToken || refresh;
 
-        tokenStorage.setTokens({ accessToken: newAccess, refreshToken: refresh });
+          tokenStorage.setTokens({ accessToken: newAccess, refreshToken: newRefresh });
 
         resolveQueue(null, newAccess);
         original.headers.Authorization = `Bearer ${newAccess}`;

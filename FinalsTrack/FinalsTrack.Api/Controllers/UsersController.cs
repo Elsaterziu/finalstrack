@@ -40,7 +40,8 @@ namespace FinalsTrack.Api.Controllers
                 FullName = user.FullName,
                 Email = user.Email,
                 CreatedAt = user.CreatedAt,
-                Roles = roles
+                Roles = roles,
+                IsActive = user.IsActive
             });
         }
 
@@ -101,7 +102,8 @@ namespace FinalsTrack.Api.Controllers
                     FullName = u.FullName,
                     Email = u.Email,
                     CreatedAt = u.CreatedAt,
-                    Roles = roles
+                    Roles = roles,
+                    IsActive = u.IsActive
                 });
             }
 
@@ -124,8 +126,10 @@ namespace FinalsTrack.Api.Controllers
                 FullName = user.FullName,
                 Email = user.Email,
                 CreatedAt = user.CreatedAt,
-                Roles = roles
+                Roles = roles,
+                IsActive = user.IsActive
             });
+
         }
 
         // ===================== ADMIN: DELETE USER =====================

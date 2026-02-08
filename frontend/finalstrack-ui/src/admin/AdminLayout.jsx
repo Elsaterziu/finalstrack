@@ -9,11 +9,11 @@ export default function AdminLayout() {
   const { logout } = useAuth();
 
   const [me, setMe] = useState(null);
-  const [q, setQ] = useState("");
 
-  useEffect(() => {
-    adminService.getMe().then(setMe).catch(() => {});
-  }, []);
+useEffect(() => {
+  adminService.getAuthMe().then(setMe).catch(() => {});
+}, []);
+
 
   const initials = useMemo(() => {
     const name = me?.fullName || "Admin";
@@ -32,7 +32,6 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-shell">
-      {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <div className="logo">
@@ -65,77 +64,40 @@ export default function AdminLayout() {
             Settings
           </NavLink>
         </nav>
+
+        <div className="sidebar-footer">
+          <button className="btn-soft btn-danger-soft w-100" onClick={onLogout}>
+            <i className="bi bi-box-arrow-right" /> Logout
+          </button>
+        </div>
       </aside>
 
-      {/* Main */}
       <main className="admin-main">
-        {/* Topbar */}
         <div className="admin-topbar">
-          <div className="topbar-search">
-            <i className="bi bi-search" />
-            <input
-              placeholder="Search users..."
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-            />
+          {/* Title (replaces search) */}
+          <div>
+            <div style={{ fontWeight: 950, color: "var(--text)", lineHeight: 1.1 }}>
+              Admin Panel
+            </div>
+            <div className="small-muted">Manage users & roles</div>
           </div>
 
           <div className="topbar-right">
-            <button className="btn-soft" type="button" title="Notifications">
-              <i className="bi bi-bell" />
-            </button>
-
-            <div className="dropdown">
-              <button
-                className="btn-soft"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                style={{ display: "flex", alignItems: "center", gap: 10 }}
-              >
-                <div className="avatar">{initials}</div>
-                <div className="d-none d-md-block" style={{ textAlign: "left" }}>
-                  <div style={{ fontWeight: 900, lineHeight: 1.1 }}>
-                    {me?.fullName || "Admin"}
-                  </div>
-                  <div className="small-muted">{me?.email || ""}</div>
-                </div>
-                <i className="bi bi-chevron-down" />
+            <div className="profile-chip">
+              <div className="avatar">{initials}</div>
+              <div className="profile-meta">
+                <div className="profile-name">{me?.fullName || "Admin"}</div>
+                <div className="profile-email">{me?.email || ""}</div>
+              </div>
+              <button className="icon-btn" onClick={onLogout} title="Logout">
+                <i className="bi bi-box-arrow-right" />
               </button>
-
-              <ul className="dropdown-menu dropdown-menu-end shadow-sm">
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => navigate("/admin/profile")}
-                  >
-                    <i className="bi bi-person me-2" /> Edit Profile
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => navigate("/admin/password")}
-                  >
-                    <i className="bi bi-key me-2" /> Change Password
-                  </button>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <button className="dropdown-item text-danger" onClick={onLogout}>
-                    <i className="bi bi-box-arrow-right me-2" /> Logout
-                  </button>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div style={{ marginTop: 14 }}>
-          <Outlet context={{ searchQuery: q }} />
+        <div className="admin-content">
+          <Outlet />
         </div>
       </main>
     </div>

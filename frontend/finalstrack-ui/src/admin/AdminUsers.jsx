@@ -1,18 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 import { adminService } from "../admin/adminService";
 
 export default function AdminUsers() {
-  const { searchQuery } = useOutletContext();
-
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
+  const [search, setSearch] = useState("");
+
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  // roles dropdown (dinamik)
   const roleOptions = useMemo(() => {
     const set = new Set();
     users.forEach((u) => (u.roles || []).forEach((r) => set.add(r)));
@@ -37,7 +35,7 @@ export default function AdminUsers() {
   }, []);
 
   const filtered = useMemo(() => {
-    const q = (searchQuery || "").toLowerCase().trim();
+    const q = (search || "").toLowerCase().trim();
 
     return users.filter((u) => {
       const matchesQ =
@@ -53,21 +51,14 @@ export default function AdminUsers() {
         statusFilter === "All"
           ? true
           : statusFilter === "Active"
-            ? u.isActive === true
-            : u.isActive === false;
+          ? u.isActive === true
+          : u.isActive === false;
 
       return matchesQ && matchesRole && matchesStatus;
     });
-  }, [users, searchQuery, roleFilter, statusFilter]);
+  }, [users, search, roleFilter, statusFilter]);
 
-  const stats = useMemo(() => {
-    const total = users.length;
-    const active = users.filter((u) => u.isActive).length;
-    const disabled = users.filter((u) => !u.isActive).length;
-    return { total, active, disabled };
-  }, [users]);
-
-  // roles modal
+  // modal roles
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState([]);
@@ -131,58 +122,22 @@ export default function AdminUsers() {
 
   return (
     <div>
-      <h2 className="page-title">Admin Panel</h2>
-
-      {/* Cards */}
-      <div className="cards-row">
-        <div className="stat-card2">
-          <div className="stat-ic ic-purple">
-            <i className="bi bi-people" />
-          </div>
-          <div>
-            <div className="stat-num">{stats.total}</div>
-            <div className="stat-lbl">Total Users</div>
-          </div>
-        </div>
-
-        <div className="stat-card2">
-          <div className="stat-ic ic-green">
-            <i className="bi bi-check-circle" />
-          </div>
-          <div>
-            <div className="stat-num">{stats.active}</div>
-            <div className="stat-lbl">Active Users</div>
-          </div>
-        </div>
-
-        <div className="stat-card2">
-          <div className="stat-ic ic-red">
-            <i className="bi bi-slash-circle" />
-          </div>
-          <div>
-            <div className="stat-num">{stats.disabled}</div>
-            <div className="stat-lbl">Disabled Users</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Panel */}
       <div className="panel">
         <div className="panel-header">
-          <div>
-            <h5>Manage Users</h5>
-            <div className="small-muted">Search is from topbar.</div>
-          </div>
-        </div>
+                <div>
+          <h5>Manage Users</h5>
+      <div className="small-muted">Search, filter and manage accounts.</div>
+            </div>
+         </div>
 
-        {/* Filters */}
+
         <div className="filters-row">
           <div className="f-input">
             <i className="bi bi-search" />
             <input
-              placeholder="Search name or email..."
-              value={searchQuery || ""}
-              readOnly
+              placeholder="Search name, email or ID..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
@@ -209,7 +164,6 @@ export default function AdminUsers() {
           </select>
         </div>
 
-        {/* Table */}
         <div className="table-wrap">
           {loading ? (
             <div className="p-4">Loading...</div>
@@ -219,12 +173,12 @@ export default function AdminUsers() {
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th style={{ width: 80 }}>ID</th>
-                  <th>Full Name</th>
+                  <th style={{ width: 70 }}>ID</th>
+                  <th>User</th>
                   <th>Email</th>
                   <th style={{ width: 140 }}>Status</th>
-                  <th style={{ width: 220 }}>Roles</th>
-                  <th style={{ width: 320, textAlign: "right" }}>Actions</th>
+                  <th style={{ width: 240 }}>Roles</th>
+                  <th style={{ width: 360, textAlign: "right" }}>Actions</th>
                 </tr>
               </thead>
 
@@ -232,7 +186,17 @@ export default function AdminUsers() {
                 {filtered.map((u) => (
                   <tr key={u.id}>
                     <td>{u.id}</td>
-                    <td style={{ fontWeight: 900 }}>{u.fullName}</td>
+
+                    <td className="u-name">
+                      <div className="u-avatar">
+                        {(u.fullName || "U").slice(0, 1).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="u-full">{u.fullName}</div>
+                        <div className="small-muted">#{u.id}</div>
+                      </div>
+                    </td>
+
                     <td className="small-muted">{u.email}</td>
 
                     <td>
@@ -245,7 +209,7 @@ export default function AdminUsers() {
 
                     <td>
                       {(u.roles || []).length ? (
-                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        <div className="roles-wrap">
                           {u.roles.map((r) => (
                             <span key={r} className="badge-pill role-pill">
                               {r}
@@ -263,7 +227,7 @@ export default function AdminUsers() {
                           className="btn-soft btn-primary-soft"
                           onClick={() => openRoles(u)}
                         >
-                          Manage Roles
+                          <i className="bi bi-shield-check" /> Roles
                         </button>
 
                         <button
@@ -276,9 +240,9 @@ export default function AdminUsers() {
                         </button>
 
                         <button
-                          className="btn-soft btn-danger-soft"
+                          className="icon-danger"
                           onClick={() => delUser(u)}
-                          title="Delete user"
+                          title="Delete"
                         >
                           <i className="bi bi-trash" />
                         </button>
@@ -300,67 +264,53 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {/* Roles Modal (Bootstrap) */}
       {roleModalOpen && (
-        <div
-          className="modal d-block"
-          tabIndex="-1"
-          role="dialog"
-          style={{ background: "rgba(0,0,0,.35)" }}
-        >
-          <div className="modal-dialog modal-dialog-centered" role="document">
-            <div className="modal-content border-0 shadow">
-              <div className="modal-header">
-                <h5 className="modal-title">Manage Roles</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setRoleModalOpen(false)}
-                />
-              </div>
-
-              <div className="modal-body">
-                <div className="mb-2">
-                  <div className="fw-semibold">{selectedUser?.fullName}</div>
-                  <div className="text-muted small">{selectedUser?.email}</div>
-                </div>
-
-                <div className="d-flex flex-wrap gap-2 mt-3">
-                  {roleOptions
-                    .filter((r) => r !== "All")
-                    .map((r) => {
-                      const active = selectedRoles.includes(r);
-                      return (
-                        <button
-                          key={r}
-                          type="button"
-                          className={`btn btn-sm ${
-                            active ? "btn-success" : "btn-outline-secondary"
-                          }`}
-                          onClick={() => toggleRole(r)}
-                        >
-                          {r}
-                        </button>
-                      );
-                    })}
+        <div className="modalx-backdrop" onClick={() => setRoleModalOpen(false)}>
+          <div className="modalx" onClick={(e) => e.stopPropagation()}>
+            <div className="modalx-head">
+              <div>
+                <div className="modalx-title">Manage Roles</div>
+                <div className="small-muted">
+                  {selectedUser?.fullName} • {selectedUser?.email}
                 </div>
               </div>
 
-              <div className="modal-footer">
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={() => setRoleModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={saveRoles}
-                  disabled={roleSaving}
-                >
-                  {roleSaving ? "Saving..." : "Save"}
-                </button>
+              <button className="icon-btn" onClick={() => setRoleModalOpen(false)}>
+                <i className="bi bi-x-lg" />
+              </button>
+            </div>
+
+            <div className="modalx-body">
+              <div className="role-pills">
+                {roleOptions
+                  .filter((r) => r !== "All")
+                  .map((r) => {
+                    const active = selectedRoles.includes(r);
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        className={`role-toggle ${active ? "on" : ""}`}
+                        onClick={() => toggleRole(r)}
+                      >
+                        {active && <i className="bi bi-check2" />} {r}
+                      </button>
+                    );
+                  })}
               </div>
+            </div>
+
+            <div className="modalx-foot">
+              <button className="btn-soft" onClick={() => setRoleModalOpen(false)}>
+                Cancel
+              </button>
+              <button
+                className="btn-soft btn-primary-soft"
+                onClick={saveRoles}
+                disabled={roleSaving}
+              >
+                {roleSaving ? "Saving..." : "Save"}
+              </button>
             </div>
           </div>
         </div>

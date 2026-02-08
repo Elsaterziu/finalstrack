@@ -29,7 +29,8 @@ namespace FinalsTrack.Api.Services
             {
                 FullName = fullName.Trim(),
                 Email = email.Trim(),
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                IsActive = false
             };
 
             await _users.AddAsync(user);
@@ -72,6 +73,9 @@ namespace FinalsTrack.Api.Services
 
         public async Task<List<User>> GetAllAsync()
             => await _users.GetAllAsync();
+        ///
+        public async Task<List<User>> GetAllActiveAsync()
+    => await _users.GetAllActiveAsync();
 
         public async Task<bool> DeleteAsync(int userId)
         {

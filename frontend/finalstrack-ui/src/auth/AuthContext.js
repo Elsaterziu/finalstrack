@@ -27,13 +27,18 @@ export function AuthProvider({ children }) {
     };
     init();
   }, []);
+const login = async (email, password) => {
+  tokenStorage.clear();
+  setUser(null);
 
-  const login = async (email, password) => {
-    await authService.login(email, password);
-    const me = await authService.me();
-    setUser(me);
-    return me;
-  };
+  await authService.login(email, password);
+
+  const me = await authService.me();
+  setUser(me);
+
+  return me;
+};
+
 
   const register = async (fullName, email, password) => {
     return await authService.register(fullName, email, password);
@@ -41,6 +46,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     await authService.logout();
+    tokenStorage.clear();
     setUser(null);
   };
 

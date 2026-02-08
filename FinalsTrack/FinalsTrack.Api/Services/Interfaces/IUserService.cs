@@ -14,6 +14,8 @@ namespace FinalsTrack.Api.Services.Interfaces
         Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
 
         Task<List<User>> GetAllAsync();      // Admin
+
+        Task<List<User>> GetAllActiveAsync(); // Public
         Task<bool> DeleteAsync(int userId);  // Admin
         Task<bool> SetActiveStatusAsync(int userId, bool isActive);
 

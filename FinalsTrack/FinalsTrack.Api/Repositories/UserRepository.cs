@@ -22,10 +22,14 @@ namespace FinalsTrack.Api.Repositories
 
         public async Task<List<User>> GetAllAsync()
             => await _context.Users
-                .Where(u => u.IsActive)
                 .OrderBy(u => u.Id)
                 .ToListAsync();
 
+        public async Task<List<User>> GetAllActiveAsync()
+            => await _context.Users
+                .Where(u => u.IsActive)
+                .OrderBy(u => u.Id)
+                .ToListAsync();
         public async Task AddAsync(User user)
             => await _context.Users.AddAsync(user);
 

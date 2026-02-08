@@ -21,8 +21,8 @@ export default function AuthPage() {
   const [error, setError] = useState("");
 
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("admin@test.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const title = useMemo(
     () => (mode === "signin" ? "Sign In" : "Sign Up"),
@@ -48,11 +48,12 @@ export default function AuthPage() {
       const me = await login(email.trim(), password);
       const roles = me?.roles || [];
 
-      if (roles.includes("Admin")) {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/student", { replace: true });
-      }
+          if (roles.includes("Admin")) {
+            navigate("/admin", { replace: true });
+          } else {
+            navigate("/dashboard", { replace: true }); 
+          }
+
 
     } catch (err) {
       const msg =
