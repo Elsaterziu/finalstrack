@@ -50,9 +50,11 @@ export default function AuthPage() {
 
       if (roles.includes("Admin")) {
         navigate("/admin", { replace: true });
-      } else {
-        navigate("/student", { replace: true });
-      }
+              } else if (roles.includes("Professor")) {
+          navigate("/professor", { replace: true });
+             } else {
+          navigate("/student", { replace: true });
+          }
 
     } catch (err) {
       const msg =
