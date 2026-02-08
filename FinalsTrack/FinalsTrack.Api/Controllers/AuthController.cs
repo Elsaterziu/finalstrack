@@ -114,19 +114,28 @@ namespace FinalsTrack.Api.Controllers
         // ================= ME =================
         [Authorize]
         [HttpGet("me")]
-        public IActionResult Me()
+        public async Task<IActionResult> Me()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            var roles = User.FindAll(ClaimTypes.Role).Select(r => r.Value);
+            int userId = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)!
+            );
+
+            var user = await _userService.GetByIdAsync(userId);
+            if (user == null)
+                return Unauthorized();
+
+            var roles = User.FindAll(ClaimTypes.Role)
+                            .Select(r => r.Value);
 
             return Ok(new
             {
-                userId,
-                email,
+                userId = user.Id,
+                email = user.Email,
+                fullName = user.FullName,
                 roles
             });
         }
+
 
         // ================= JWT HELPER (WITH ROLES) =================
         private async Task<string> GenerateJwtAsync(int userId, string email)

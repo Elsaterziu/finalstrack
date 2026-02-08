@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 
 import AuthPage from "./pages/AuthPage";
-import Dashboard from "./pages/Dashboard";
+import StudentDashboard from "./pages/student/Dashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminOnlyRoute from "./components/AdminOnlyRoute";
@@ -14,26 +14,39 @@ import AdminUsers from "./admin/AdminUsers";
 import AdminRoles from "./admin/AdminRoles";
 import AdminSettings from "./admin/AdminSettings";
 
+import StudentLayout from "./layouts/StudentLayout";
+import Exams from "./pages/student/Exams";
+import Subjects from "./pages/student/Subjects";
+import StudyBlocks from "./pages/student/StudyBlocks";
+import StressLogs from "./pages/student/StressLogs";
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+
           {/* ROOT */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/auth" replace />} />
 
           {/* AUTH */}
           <Route path="/auth" element={<AuthPage />} />
 
-          {/* USER DASHBOARD */}
+          {/* STUDENT */}
           <Route
-            path="/dashboard"
+            path="/student"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <StudentLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<StudentDashboard />} />
+              <Route path="exams" element={<Exams />} />
+              <Route path="subjects" element={<Subjects />} />
+              <Route path="study-blocks" element={<StudyBlocks />} />
+              <Route path="stress-logs" element={<StressLogs />} />
+          </Route>
 
           {/* ADMIN */}
           <Route
@@ -48,11 +61,11 @@ export default function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="roles" element={<AdminRoles />} />
             <Route path="settings" element={<AdminSettings />} />
-
           </Route>
 
           {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/auth" replace />} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

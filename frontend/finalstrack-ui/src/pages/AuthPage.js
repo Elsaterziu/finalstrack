@@ -48,12 +48,11 @@ export default function AuthPage() {
       const me = await login(email.trim(), password);
       const roles = me?.roles || [];
 
-          if (roles.includes("Admin")) {
-            navigate("/admin", { replace: true });
-          } else {
-            navigate("/dashboard", { replace: true }); 
-          }
-
+      if (roles.includes("Admin")) {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/student", { replace: true });
+      }
 
     } catch (err) {
       const msg =

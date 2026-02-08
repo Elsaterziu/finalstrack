@@ -33,6 +33,27 @@
   color: #0d6efd;
 }
 
+.stat-icon.primary {
+  color: #0d6efd; /* blue */
+}
+
+.stat-icon.success {
+  color: #198754; /* green */
+}
+
+.stat-icon.warning {
+  color: #ffc107; /* yellow */
+}
+
+.stat-icon.danger {
+  color: #dc3545; /* red */
+}
+
+.stat-icon.info {
+  color: #0dcaf0; /* cyan */
+}
+
+
 .stat-title {
   font-size: 0.85rem;
   color: #6c757d;

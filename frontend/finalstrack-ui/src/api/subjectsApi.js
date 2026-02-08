@@ -1,7 +1,7 @@
 import apiClient from "./apiClient";
 
 export const getSubjects = () =>
-  apiClient.get("/subjects");
+  apiClient.get("/api/subjects");
 
 export const getSubjectById = (id) =>
-  apiClient.get(`/subjects/${id}`);
+  apiClient.get(`/api/subjects/${id}`);

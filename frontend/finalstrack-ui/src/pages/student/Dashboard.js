@@ -17,7 +17,18 @@ import StudyTimeChart from "../../components/charts/StudyTimeChart";
 
 import "./dashboard.css";
 
-const Dashboard = () => {
+/* time helper */
+const formatMinutes = (minutes) => {
+  if (!minutes || minutes <= 0) return "0 min";
+  if (minutes < 60) return `${minutes} min`;
+
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+};
+
+/* dashboard */
+export default function Dashboard() {
   const [activeSeason, setActiveSeason] = useState(null);
   const [exams, setExams] = useState([]);
   const [nextExam, setNextExam] = useState(null);
@@ -37,7 +48,9 @@ const Dashboard = () => {
       const seasons = (await getExamSeasons()).data;
 
       const active = seasons.find(
-        s => new Date(s.startDate) <= today && new Date(s.endDate) >= today
+        (s) =>
+          new Date(s.startDate) <= today &&
+          new Date(s.endDate) >= today
       );
 
       if (!active) return;
@@ -46,11 +59,11 @@ const Dashboard = () => {
       const examsData = (await getExamsBySeason(active.id)).data;
 
       const upcoming = examsData
-        .map(e => ({
+        .map((e) => ({
           ...e,
           fullDate: new Date(`${e.examDate}T${e.examTime}`)
         }))
-        .filter(e => e.fullDate > today)
+        .filter((e) => e.fullDate > today)
         .sort((a, b) => a.fullDate - b.fullDate);
 
       setNextExam(upcoming[0] ?? null);
@@ -62,7 +75,11 @@ const Dashboard = () => {
 
       for (const exam of examsData) {
         const blocks = (await getStudyBlocksByExam(exam.id)).data;
-        const examMinutes = blocks.reduce((s, b) => s + b.durationMinutes, 0);
+        const examMinutes = blocks.reduce(
+          (sum, b) => sum + b.durationMinutes,
+          0
+        );
+
         exam.totalStudyMinutes = examMinutes;
         totalMinutes += examMinutes;
 
@@ -76,19 +93,22 @@ const Dashboard = () => {
       setExams([...examsData]);
       setStressLogs(allLogs);
       setTotalStudyMinutes(totalMinutes);
-      setAvgStress(stressCount ? (stressSum / stressCount).toFixed(1) : null);
+      setAvgStress(
+        stressCount ? (stressSum / stressCount).toFixed(1) : null
+      );
     } catch (err) {
       console.error("Dashboard load failed:", err);
     }
   };
 
-  /* COUNTDOWN */
+  /* countdown */
   useEffect(() => {
     if (!nextExam) return;
 
     const timer = setInterval(() => {
       const diff =
-        new Date(`${nextExam.examDate}T${nextExam.examTime}`) - new Date();
+        new Date(`${nextExam.examDate}T${nextExam.examTime}`) -
+        new Date();
 
       if (diff <= 0) {
         setCountdown(null);
@@ -111,7 +131,9 @@ const Dashboard = () => {
       <h2 className="dashboard-title">Student Dashboard</h2>
 
       {!activeSeason && (
-        <div className="alert alert-warning">No active exam season</div>
+        <div className="alert alert-warning">
+          No active exam season
+        </div>
       )}
 
       {activeSeason && (
@@ -120,39 +142,48 @@ const Dashboard = () => {
             Active Season: <strong>{activeSeason.title}</strong>
           </p>
 
-          {/* STATS */}
           <div className="row g-4 mb-4">
-            <StatCard icon={<FaCalendarAlt />} title="Upcoming Exams" value={exams.length} />
+            <StatCard
+              icon={<FaCalendarAlt />}
+              title="Upcoming Exams"
+              value={exams.length}
+              color="info"
+            />
+
             <StatCard
               icon={<FaBook />}
               title="Next Exam"
               value={nextExam?.subjectName ?? "—"}
-              sub={`${nextExam?.examDate ?? ""} ${nextExam?.examTime ?? ""}`}
+              sub={nextExam ? `${nextExam.examDate} ${nextExam.examTime}` : ""}
+              color="primary"
             />
+
             <StatCard
               icon={<FaHourglassHalf />}
               title="Countdown"
-              value={
-                countdown
-                  ? `${countdown.days}d ${countdown.hours}h`
-                  : "—"
-              }
+              value={countdown ? `${countdown.days}d ${countdown.hours}h` : "—"}
               sub={countdown ? `${countdown.minutes}m remaining` : ""}
+              color="warning"
             />
+
             <StatCard
               icon={<FaClock />}
               title="Study Time"
-              value={`${totalStudyMinutes} min`}
+              value={formatMinutes(totalStudyMinutes)}
+              sub={`${totalStudyMinutes} min total`}
+              color="success"
             />
+
             <StatCard
               icon={<FaBrain />}
               title="Avg Stress"
               value={avgStress ?? "-"}
               danger={avgStress >= 7}
+              color="danger"
             />
+
           </div>
 
-          {/* CHARTS */}
           <div className="row g-4">
             <div className="col-md-6">
               <div className="dashboard-card">
@@ -162,7 +193,8 @@ const Dashboard = () => {
                   Avg stress: <b>{avgStress}/10</b>
                   {avgStress >= 7 && (
                     <span className="stress-warning">
-                      ⚠️ High stress detected
+                      <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                      High stress detected
                     </span>
                   )}
                 </div>
@@ -183,12 +215,15 @@ const Dashboard = () => {
       )}
     </div>
   );
-};
+}
 
-const StatCard = ({ icon, title, value, sub, danger }) => (
+/* stat card */
+const StatCard = ({ icon, title, value, sub, danger, color }) => (
   <div className="col-md-6 col-lg-3">
     <div className={`stat-card ${danger ? "stat-danger" : ""}`}>
-      <div className="stat-icon">{icon}</div>
+      <div className={`stat-icon ${color || "primary"}`}>
+        {icon}
+      </div>
       <div>
         <div className="stat-title">{title}</div>
         <div className="stat-value">{value}</div>
@@ -198,4 +233,3 @@ const StatCard = ({ icon, title, value, sub, danger }) => (
   </div>
 );
 
-export default Dashboard;
