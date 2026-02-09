@@ -31,6 +31,8 @@ import AdminSettings from "./admin/AdminSettings";
 import ProfessorDashboard from "./pages/professor/Dashboard";
 import ProfessorExams from "./pages/professor/Exams";
 import ProfessorSubjects from "./pages/professor/Subjects";
+import ProfessorExamSeasons from "./pages/professor/ExamSeasons";
+
 
 export default function App() {
   return (
@@ -86,6 +88,7 @@ export default function App() {
             <Route index element={<ProfessorDashboard />} />
             <Route path="exams" element={<ProfessorExams />} />
             <Route path="subjects" element={<ProfessorSubjects />} />
+            <Route path="exam-seasons" element={<ProfessorExamSeasons />} />
           </Route>
 
           {/* FALLBACK */}

@@ -191,7 +191,7 @@ export default function Dashboard() {
                 )}
 
                 <div className="chart-footer">
-                  Tip: “Exams” page do ta ketë Create/Edit/Delete (Professor-only).
+                  
                 </div>
               </div>
             </div>
