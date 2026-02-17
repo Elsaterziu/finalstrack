@@ -1,0 +1,273 @@
+.profile-page {
+    width: 100%;
+    padding: 24px 0 40px;
+    background: #f8fafc;
+}
+
+.profile-header {
+    max-width: 1200px;
+    margin: 0 auto 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profile-main {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.profile-initials.large {
+    width: 84px;
+    height: 84px;
+    border-radius: 18px;
+    background: #304ffe;
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 28px rgba(48, 79, 254, 0.35);
+}
+
+.profile-name-block h2 {
+    margin: 0;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.profile-roles {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.role-badge.light {
+    background: #eef2ff;
+    color: #304ffe;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.profile-stats.below {
+    display: flex;
+    gap: 24px;
+    padding-left: 102px;
+}
+
+.profile-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+.profile-stat svg {
+    opacity: 0.7;
+}
+
+.profile-content.narrow {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+}
+
+.profile-card.danger {
+    border-left: 5px solid #ef4444;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon.blue {
+    background: #eef2ff;
+    color: #304ffe;
+}
+
+.card-icon.red {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.profile-row {
+    display: flex;
+    /* justify-content: 34px;  */
+    padding: 14px ;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 8px;
+}
+
+.profile-row span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+}
+
+.profile-row strong {
+    color: #0f172a;
+}
+
+.security-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-card label {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.profile-card .form-control {
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.profile-card .form-control:focus {
+    border-color: #304ffe;
+    box-shadow: 0 0 0 3px rgba(48, 79, 254, 0.15);
+}
+
+.profile-card .btn-primary {
+    background: #304ffe;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.profile-card .btn-primary:hover {
+    background: #2536d8;
+}
+
+.btn-outline-danger {
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.small {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* ================= MODAL ================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.modal-sheet {
+    background: #ffffff;
+    width: 480px;
+    border-radius: 18px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    animation: sheetIn 0.22s ease-out;
+}
+
+.modal-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #eee;
+    background: #f9fafb;
+}
+
+.modal-sheet-header h5 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-sheet-body {
+    padding: 22px;
+}
+
+.modal-sheet-footer {
+    padding: 18px 22px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: #f9fafb;
+    border-top: 1px solid #eee;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes sheetIn {
+    from {
+        transform: translateY(10px) scale(0.96);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field .form-control {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.password-toggle:hover {
+  color: #0f172a;
+}

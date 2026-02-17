@@ -27,17 +27,17 @@ export function AuthProvider({ children }) {
     };
     init();
   }, []);
-const login = async (email, password) => {
-  tokenStorage.clear();
-  setUser(null);
+  const login = async (email, password) => {
+    tokenStorage.clear();
+    setUser(null);
 
-  await authService.login(email, password);
+    await authService.login(email, password);
 
-  const me = await authService.me();
-  setUser(me);
+    const me = await authService.me();
+    setUser(me);
 
-  return me;
-};
+    return me;
+  };
 
 
   const register = async (fullName, email, password) => {
@@ -51,7 +51,10 @@ const login = async (email, password) => {
   };
 
   return (
-    <AuthCtx.Provider value={{ user, booting, login, register, logout }}>
+    <AuthCtx.Provider
+      value={{ user, setUser, booting, login, register, logout }}
+    >
+
       {children}
     </AuthCtx.Provider>
   );

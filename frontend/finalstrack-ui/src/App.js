@@ -20,6 +20,7 @@ import Exams from "./pages/student/Exams";
 import Subjects from "./pages/student/Subjects";
 import StudyBlocks from "./pages/student/StudyBlocks";
 import StressLogs from "./pages/student/StressLogs";
+import Profile from "./pages/student/Profile";
 
 // Admin pages
 import AdminDashboard from "./admin/AdminDashboard";
@@ -59,6 +60,7 @@ export default function App() {
             <Route path="subjects" element={<Subjects />} />
             <Route path="study-blocks" element={<StudyBlocks />} />
             <Route path="stress-logs" element={<StressLogs />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* ADMIN */}

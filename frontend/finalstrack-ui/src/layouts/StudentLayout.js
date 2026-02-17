@@ -6,8 +6,10 @@ import {
   FaClock,
   FaHeartbeat,
   FaSignOutAlt,
-  FaGraduationCap
+  FaGraduationCap,
+  FaUser
 } from "react-icons/fa";
+
 
 import { useAuth } from "../auth/AuthContext";
 import "./StudentLayout.css";
@@ -41,7 +43,9 @@ console.log("ME USER:", user);
           <NavItem to="/student/subjects" icon={<FaLayerGroup />} label="Subjects" />
           <NavItem to="/student/study-blocks" icon={<FaClock />} label="Study Blocks" />
           <NavItem to="/student/stress-logs" icon={<FaHeartbeat />} label="Stress Logs" />
+          <NavItem to="/student/profile" icon={<FaUser />} label="Profile" />
         </nav>
+
 
         {/* LOGOUT */}
         <div className="sidebar-footer">
@@ -52,8 +56,7 @@ console.log("ME USER:", user);
             onClick={logout}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") logout();
-            }}
-          >
+            }}>
             <span className="sidebar-icon">
               <FaSignOutAlt />
             </span>
