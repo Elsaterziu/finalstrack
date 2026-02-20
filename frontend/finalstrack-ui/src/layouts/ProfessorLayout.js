@@ -5,11 +5,12 @@ import {
   FaLayerGroup,
   FaSignOutAlt,
   FaGraduationCap,
-  FaCalendarAlt
+  FaCalendarAlt,
+  FaUser
 } from "react-icons/fa";
 
 import { useAuth } from "../auth/AuthContext";
-import "./StudentLayout.css"; 
+import "./StudentLayout.css";
 
 export default function ProfessorLayout() {
   const { user, logout } = useAuth();
@@ -17,7 +18,6 @@ export default function ProfessorLayout() {
   return (
     <div className="student-layout">
       <aside className="student-sidebar">
-        {/* BRAND */}
         <div className="sidebar-brand-box">
           <div className="sidebar-logo">
             <FaGraduationCap />
@@ -30,15 +30,14 @@ export default function ProfessorLayout() {
           </div>
         </div>
 
-        {/* NAV */}
         <nav className="sidebar-nav">
           <NavItem to="/professor" icon={<FaTachometerAlt />} label="Dashboard" />
           <NavItem to="/professor/exams" icon={<FaBook />} label="Exams" />
           <NavItem to="/professor/subjects" icon={<FaLayerGroup />} label="Subjects" />
           <NavItem to="/professor/exam-seasons" icon={<FaCalendarAlt />} label="Exam Seasons" />
+          <NavItem to="/professor/profile" icon={<FaUser />} label="Profile" />
         </nav>
 
-        {/* LOGOUT */}
         <div className="sidebar-footer">
           <div
             className="sidebar-link logout-link"

@@ -33,7 +33,7 @@ import ProfessorDashboard from "./pages/professor/Dashboard";
 import ProfessorExams from "./pages/professor/Exams";
 import ProfessorSubjects from "./pages/professor/Subjects";
 import ProfessorExamSeasons from "./pages/professor/ExamSeasons";
-
+import ProfessorProfile from "./pages/professor/Profile";
 
 export default function App() {
   return (
@@ -91,6 +91,7 @@ export default function App() {
             <Route path="exams" element={<ProfessorExams />} />
             <Route path="subjects" element={<ProfessorSubjects />} />
             <Route path="exam-seasons" element={<ProfessorExamSeasons />} />
+            <Route path="profile" element={<ProfessorProfile />} />
           </Route>
 
           {/* FALLBACK */}

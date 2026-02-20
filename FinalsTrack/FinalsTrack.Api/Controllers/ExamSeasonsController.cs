@@ -8,6 +8,7 @@ namespace FinalsTrack.Api.Controllers;
 
 [ApiController]
 [Route("api/exam-seasons")]
+[Authorize(Roles = "Professor,Student")]
 
 public class ExamSeasonsController : ControllerBase
 {
@@ -19,14 +20,12 @@ public class ExamSeasonsController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Student,Professor")]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Student,Professor")]
     public async Task<IActionResult> GetById(int id)
     {
         var result = await _service.GetByIdAsync(id);
@@ -34,7 +33,7 @@ public class ExamSeasonsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = "Professor")]
     public async Task<IActionResult> Create([FromBody] CreateExamSeasonDto dto)
     {
         int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -44,7 +43,7 @@ public class ExamSeasonsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = "Professor")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateExamSeasonDto dto)
     {
         int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -56,7 +55,7 @@ public class ExamSeasonsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = "Professor")]
     public async Task<IActionResult> Delete(int id)
     {
         await _service.DeleteAsync(id);

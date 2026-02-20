@@ -8,6 +8,7 @@ namespace FinalsTrack.Api.Controllers;
 
 [ApiController]
 [Route("api/subjects")]
+[Authorize(Roles = "Professor,Student")]
 public class SubjectsController : ControllerBase
 {
     private readonly ISubjectService _service;
@@ -18,7 +19,6 @@ public class SubjectsController : ControllerBase
     }
 
     
-    [Authorize(Roles = "Professor,Student")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -26,7 +26,6 @@ public class SubjectsController : ControllerBase
     }
 
     
-    [Authorize(Roles = "Professor,Student")]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {

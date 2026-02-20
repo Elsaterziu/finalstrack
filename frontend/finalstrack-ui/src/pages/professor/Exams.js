@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
+import { useCallback } from "react";
 
 import { getExamSeasons } from "../../api/examSeasonsApi";
 import { getSubjects } from "../../api/subjectsApi";
@@ -10,7 +11,7 @@ import {
   deleteExam
 } from "../../api/examsApi";
 
-import "../student/dashboard.css"; 
+import "../student/dashboard.css";
 
 const normalizeTime = (t) => {
   if (!t) return "";
@@ -55,11 +56,8 @@ export default function ProfessorExams() {
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    bootstrap();
-  }, []);
 
-  const bootstrap = async () => {
+  const bootstrap = useCallback(async () => {
     try {
       setLoading(true);
       const [seasonsRes, subjectsRes] = await Promise.all([
@@ -73,7 +71,6 @@ export default function ProfessorExams() {
       setSeasons(seasonsData);
       setSubjects(subjectsData);
 
-      // default: active season or first
       const today = new Date();
       const active = seasonsData.find(
         (s) => new Date(s.startDate) <= today && new Date(s.endDate) >= today
@@ -90,7 +87,12 @@ export default function ProfessorExams() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+    useEffect(() => {
+    bootstrap();
+  }, [bootstrap]);
+
 
   const loadExamsBySeason = async (seasonId) => {
     try {

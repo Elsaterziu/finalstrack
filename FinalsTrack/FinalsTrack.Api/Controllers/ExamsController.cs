@@ -8,6 +8,7 @@ namespace FinalsTrack.Api.Controllers;
 
 [ApiController]
 [Route("api/exams")]
+[Authorize(Roles = "Professor,Student")]
 public class ExamsController : ControllerBase
 {
     private readonly IExamService _service;
@@ -17,16 +18,14 @@ public class ExamsController : ControllerBase
         _service = service;
     }
 
-    
-    [Authorize(Roles = "Professor,Student")]
+
     [HttpGet("season/{examSeasonId:int}")]
     public async Task<IActionResult> GetBySeason(int examSeasonId)
     {
         return Ok(await _service.GetByExamSeasonAsync(examSeasonId));
     }
 
-    
-    [Authorize(Roles = "Professor,Student")]
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {

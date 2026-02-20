@@ -17,7 +17,7 @@ import StudyTimeChart from "../../components/charts/StudyTimeChart";
 
 import "./dashboard.css";
 
-/* time helper */
+/* helper */
 const formatMinutes = (minutes) => {
   if (!minutes || minutes <= 0) return "0 min";
   if (minutes < 60) return `${minutes} min`;
@@ -27,7 +27,6 @@ const formatMinutes = (minutes) => {
   return m === 0 ? `${h}h` : `${h}h ${m}m`;
 };
 
-/* dashboard */
 export default function Dashboard() {
   const [activeSeason, setActiveSeason] = useState(null);
   const [exams, setExams] = useState([]);
@@ -80,8 +79,8 @@ export default function Dashboard() {
           0
         );
 
-        exam.totalStudyMinutes = examMinutes;
         totalMinutes += examMinutes;
+        exam.totalStudyMinutes = examMinutes;
 
         const logs = (await getStressLogsByExam(exam.id)).data;
         allLogs.push(...logs);
@@ -142,6 +141,7 @@ export default function Dashboard() {
             Active Season: <strong>{activeSeason.title}</strong>
           </p>
 
+          {/* ===== TOP 4 CARDS ===== */}
           <div className="row g-4 mb-4">
             <StatCard
               icon={<FaCalendarAlt />}
@@ -154,15 +154,27 @@ export default function Dashboard() {
               icon={<FaBook />}
               title="Next Exam"
               value={nextExam?.subjectName ?? "—"}
-              sub={nextExam ? `${nextExam.examDate} ${nextExam.examTime}` : ""}
+              sub={
+                nextExam
+                  ? `${nextExam.examDate} ${nextExam.examTime}`
+                  : ""
+              }
               color="primary"
             />
 
             <StatCard
               icon={<FaHourglassHalf />}
               title="Countdown"
-              value={countdown ? `${countdown.days}d ${countdown.hours}h` : "—"}
-              sub={countdown ? `${countdown.minutes}m remaining` : ""}
+              value={
+                countdown
+                  ? `${countdown.days}d ${countdown.hours}h`
+                  : "—"
+              }
+              sub={
+                countdown
+                  ? `${countdown.minutes}m remaining`
+                  : ""
+              }
               color="warning"
             />
 
@@ -173,7 +185,10 @@ export default function Dashboard() {
               sub={`${totalStudyMinutes} min total`}
               color="success"
             />
+          </div>
 
+          {/* ===== AVG STRESS (separate row for balance) ===== */}
+          <div className="row mb-4">
             <StatCard
               icon={<FaBrain />}
               title="Avg Stress"
@@ -181,9 +196,9 @@ export default function Dashboard() {
               danger={avgStress >= 7}
               color="danger"
             />
-
           </div>
 
+          {/* ===== CHARTS ===== */}
           <div className="row g-4">
             <div className="col-md-6">
               <div className="dashboard-card">
@@ -193,7 +208,6 @@ export default function Dashboard() {
                   Avg stress: <b>{avgStress}/10</b>
                   {avgStress >= 7 && (
                     <span className="stress-warning">
-                      <i className="bi bi-exclamation-triangle-fill me-1"></i>
                       High stress detected
                     </span>
                   )}
@@ -217,9 +231,9 @@ export default function Dashboard() {
   );
 }
 
-/* stat card */
+/* reusable stat card */
 const StatCard = ({ icon, title, value, sub, danger, color }) => (
-  <div className="col-md-6 col-lg-3">
+  <div className="col-12 col-md-6 col-lg-3">
     <div className={`stat-card ${danger ? "stat-danger" : ""}`}>
       <div className={`stat-icon ${color || "primary"}`}>
         {icon}
@@ -232,4 +246,3 @@ const StatCard = ({ icon, title, value, sub, danger, color }) => (
     </div>
   </div>
 );
-
