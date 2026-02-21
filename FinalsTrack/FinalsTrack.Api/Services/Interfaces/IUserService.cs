@@ -19,5 +19,7 @@ namespace FinalsTrack.Api.Services.Interfaces
         Task<bool> DeleteAsync(int userId);  // Admin
         Task<bool> SetActiveStatusAsync(int userId, bool isActive);
 
+        Task<int> GetUsersCountByRoleAsync(string roleName);
+
     }
 }

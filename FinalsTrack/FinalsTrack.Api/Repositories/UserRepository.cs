@@ -39,6 +39,12 @@ namespace FinalsTrack.Api.Repositories
         public void Delete(User user)
             => _context.Users.Remove(user);
 
+        public async Task<int> CountByRoleAsync(string roleName)
+        {
+            return await _context.Users
+                .Where(u => u.UserRoles.Any(ur => ur.Role.Name == roleName))
+                .CountAsync();
+        }
         public async Task<int> SaveChangesAsync()
             => await _context.SaveChangesAsync();
     }

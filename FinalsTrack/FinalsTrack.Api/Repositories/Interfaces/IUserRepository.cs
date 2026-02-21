@@ -13,5 +13,7 @@ namespace FinalsTrack.Api.Repositories.Interfaces
         void Delete(User user);
 
         Task<int> SaveChangesAsync();
+
+        Task<int> CountByRoleAsync(string roleName);
     }
 }

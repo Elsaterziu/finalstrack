@@ -85,6 +85,15 @@ namespace FinalsTrack.Api.Controllers
             return Ok("Password changed");
         }
 
+        // ===================== PROFESSOR: COUNT STUDENTS =====================
+        [Authorize(Roles = "Professor")]
+        [HttpGet("count/students")]
+        public async Task<IActionResult> GetStudentsCount()
+        {
+            var count = await _userService.GetUsersCountByRoleAsync("Student");
+            return Ok(count);
+        }
+
         // ===================== ADMIN: GET ALL USERS =====================
         [Authorize(Roles = "Admin")]
         [HttpGet]

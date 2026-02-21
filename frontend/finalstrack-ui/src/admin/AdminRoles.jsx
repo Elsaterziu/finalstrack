@@ -40,7 +40,7 @@ export default function AdminRoles() {
     }
   };
 
-  // Auto-load roles when userId changes (debounced)
+  // Auto-load roles when userId changes 
   useEffect(() => {
     if (!canLoad) {
       setLoadedUserId(null);
@@ -57,7 +57,6 @@ export default function AdminRoles() {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const assign = async () => {
@@ -65,7 +64,6 @@ export default function AdminRoles() {
     const rn = String(roleToAssign || "").trim();
     if (!rn) return;
 
-    // prevent duplicates in UI
     if (roles.some((x) => String(x).toLowerCase() === rn.toLowerCase())) return;
 
     setErr("");

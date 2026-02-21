@@ -86,6 +86,9 @@ namespace FinalsTrack.Api.Services
             await _users.SaveChangesAsync();
             return true;
         }
+        public async Task<int> GetUsersCountByRoleAsync(string roleName)
+    => await _users.CountByRoleAsync(roleName);
+
         public async Task<bool> SetActiveStatusAsync(int userId, bool isActive)
         {
             var user = await _users.GetByIdAsync(userId);
