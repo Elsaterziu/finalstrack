@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
+import { FaPlus, FaTrash, FaEdit, FaSyncAlt } from "react-icons/fa";
 
 import {
   getExamSeasons,
@@ -8,7 +8,9 @@ import {
   deleteExamSeason
 } from "../../api/examSeasonsApi";
 
-import "../student/dashboard.css";
+import "../professor/professor.css";
+
+const toDate = (d) => new Date(String(d).slice(0, 10));
 
 export default function ProfessorExamSeasons() {
   const [seasons, setSeasons] = useState([]);
@@ -39,6 +41,11 @@ export default function ProfessorExamSeasons() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setQ("");
+    await load();
   };
 
   const openCreate = () => {
@@ -75,14 +82,15 @@ export default function ProfessorExamSeasons() {
       return;
     }
 
+    if (new Date(form.StartDate) > new Date(form.EndDate)) {
+      alert("Start date must be before End date.");
+      return;
+    }
+
     try {
       setLoading(true);
-
-      if (editing) {
-        await updateExamSeason(editing.id, form);
-      } else {
-        await createExamSeason(form);
-      }
+      if (editing) await updateExamSeason(editing.id, form);
+      else await createExamSeason(form);
 
       close();
       await load();
@@ -117,84 +125,111 @@ export default function ProfessorExamSeasons() {
       .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
     if (!query) return list;
-
-    return list.filter((s) =>
-      String(s.title || "").toLowerCase().includes(query)
-    );
+    return list.filter((s) => String(s.title || "").toLowerCase().includes(query));
   }, [seasons, q]);
 
+  const today = new Date();
+  const statusFor = (s) => {
+    const a = toDate(s.startDate);
+    const b = toDate(s.endDate);
+    if (today >= a && today <= b) return { label: "Active", cls: "active" };
+    if (today < a) return { label: "Upcoming", cls: "future" };
+    return { label: "Ended", cls: "ended" };
+  };
+
   return (
-    <div className="dashboard-page">
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <h2 className="dashboard-title">Exam Seasons</h2>
+    <div className="prof-page2">
+      <div className="page-head">
+        <div>
+          <h2 className="page-title">Exam Seasons</h2>
+          <div className="page-subtitle">Create and manage seasons for exams.</div>
+        </div>
 
-        <button className="btn btn-primary" onClick={openCreate}>
-          <FaPlus className="me-2" />
-          New Season
-        </button>
+        <div className="page-actions">
+          <button className="btn btn-outline-secondary" onClick={handleRefresh} disabled={loading}>
+            <FaSyncAlt className="me-2" />
+            Refresh
+          </button>
+
+          <button className="btn btn-primary" onClick={openCreate}>
+            <FaPlus className="me-2" />
+            New Season
+          </button>
+        </div>
       </div>
 
-      <div className="dashboard-card mb-3">
-        <label className="form-label">Search</label>
-        <input
-          className="form-control"
-          placeholder="e.g. January 2026"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-      </div>
-
-      <div className="dashboard-card">
-        {loading && <div className="text-muted mb-2">Loading...</div>}
-
-        {filtered.length === 0 ? (
-          <div className="text-muted">No seasons found.</div>
-        ) : (
-          <div className="table-responsive">
-            <table className="table table-sm align-middle">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Start</th>
-                  <th>End</th>
-                  <th style={{ width: 140 }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((s) => (
-                  <tr key={s.id}>
-                    <td>{s.title}</td>
-                    <td>{s.startDate}</td>
-                    <td>{s.endDate}</td>
-                    <td>
-                      <button
-                        className="btn btn-outline-secondary btn-sm me-2"
-                        onClick={() => openEdit(s)}
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="btn btn-outline-danger btn-sm"
-                        onClick={() => remove(s.id)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className="prof-card2">
+        <div className="prof-filters2">
+          <div style={{ gridColumn: "1 / span 2" }}>
+            <label className="form-label">Search</label>
+            <input
+              className="form-control"
+              placeholder="e.g. SHKURT/MARS 2026"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
           </div>
-        )}
+
+          <div className="text-muted small" style={{ paddingBottom: 6, textAlign: "right" }}>
+            {loading ? "Loading..." : `${filtered.length} shown / ${seasons.length} total`}
+          </div>
+        </div>
+
+        <div className="clean-list">
+          <div
+            className="clean-row header"
+            style={{ gridTemplateColumns: "1.6fr 0.8fr 0.8fr 0.6fr auto" }}
+          >
+            <div>Title</div>
+            <div>Start</div>
+            <div>End</div>
+            <div>Status</div>
+            <div style={{ justifySelf: "end" }}>Actions</div>
+          </div>
+
+          {filtered.length === 0 ? (
+            <div className="p-3 text-muted">No seasons found.</div>
+          ) : (
+            filtered.map((s) => {
+              const st = statusFor(s);
+              return (
+                <div
+                  key={s.id}
+                  className="clean-row"
+                  style={{ gridTemplateColumns: "1.6fr 0.8fr 0.8fr 0.6fr auto" }}
+                >
+                  <div className="main">
+                    <p className="name">{s.title}</p>
+                    <div className="meta">ID: {s.id}</div>
+                  </div>
+
+                  <div>{s.startDate}</div>
+                  <div>{s.endDate}</div>
+
+                  <div>
+                    <span className={`pill ${st.cls}`}>{st.label}</span>
+                  </div>
+
+                  <div className="actions">
+                    <button className="action-icon" onClick={() => openEdit(s)} title="Edit">
+                      <FaEdit />
+                    </button>
+                    <button className="action-icon danger" onClick={() => remove(s.id)} title="Delete">
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {isModalOpen && (
-        <div className="modal-backdrop-custom">
-          <div className="modal-card">
+        <div className="modal-backdrop-custom" onMouseDown={close}>
+          <div className="modal-card" onMouseDown={(ev) => ev.stopPropagation()}>
             <div className="d-flex align-items-center justify-content-between mb-2">
-              <h5 className="m-0">
-                {editing ? "Edit Exam Season" : "Create Exam Season"}
-              </h5>
+              <h5 className="m-0">{editing ? "Edit Exam Season" : "Create Exam Season"}</h5>
               <button className="btn btn-sm btn-outline-secondary" onClick={close}>
                 Close
               </button>
@@ -203,35 +238,18 @@ export default function ProfessorExamSeasons() {
             <form onSubmit={submit}>
               <div className="mb-2">
                 <label className="form-label">Title</label>
-                <input
-                  className="form-control"
-                  name="Title"
-                  value={form.Title}
-                  onChange={onChange}
-                />
+                <input className="form-control" name="Title" value={form.Title} onChange={onChange} />
               </div>
 
               <div className="row g-2">
                 <div className="col-md-6">
                   <label className="form-label">Start Date</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    name="StartDate"
-                    value={form.StartDate}
-                    onChange={onChange}
-                  />
+                  <input type="date" className="form-control" name="StartDate" value={form.StartDate} onChange={onChange} />
                 </div>
 
                 <div className="col-md-6">
                   <label className="form-label">End Date</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    name="EndDate"
-                    value={form.EndDate}
-                    onChange={onChange}
-                  />
+                  <input type="date" className="form-control" name="EndDate" value={form.EndDate} onChange={onChange} />
                 </div>
               </div>
 
@@ -241,6 +259,7 @@ export default function ProfessorExamSeasons() {
                 </button>
               </div>
             </form>
+
           </div>
         </div>
       )}
