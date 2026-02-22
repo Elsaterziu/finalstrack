@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FaCalendarAlt, FaBook } from "react-icons/fa";
+import { FaCalendarAlt, FaBook, FaUsers } from "react-icons/fa";
 
 import {
   BarChart,
@@ -18,6 +18,7 @@ import "react-calendar/dist/Calendar.css";
 import { getExamSeasons } from "../../api/examSeasonsApi";
 import { getExamsBySeason } from "../../api/examsApi";
 import { getSubjects } from "../../api/subjectsApi";
+import { getStudentsCount } from "../../api/usersApi";
 
 import "../professor/professor.css";
 
@@ -37,6 +38,7 @@ export default function Dashboard() {
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedExams, setSelectedExams] = useState([]);
+  const [studentsCount, setStudentsCount] = useState(0);
 
   useEffect(() => {
     loadDashboard();
@@ -72,6 +74,9 @@ export default function Dashboard() {
       );
 
       setExams(allExamsData);
+
+      const studentsRes = await getStudentsCount();
+      setStudentsCount(studentsRes.data || 0);
 
     } catch (err) {
       console.error("Dashboard load failed:", err);
@@ -165,6 +170,13 @@ export default function Dashboard() {
           title="Subjects"
           value={subjectsCount}
           color="danger"
+        />
+
+         <StatCard
+          icon={<FaUsers />}
+          title="Total Students"
+          value={studentsCount}
+          color="secondary"
         />
       </div>
 

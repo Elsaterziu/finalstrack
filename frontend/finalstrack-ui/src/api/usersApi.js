@@ -14,3 +14,6 @@ export const deleteUser = (id) => apiClient.delete(`/users/${id}`);
 // ✅ status endpoint uses query param: ?active=true/false (NO body)
 export const updateUserStatus = (id, active) =>
   apiClient.put(`/users/${id}/status`, null, { params: { active } });
+
+// ====== PROFESSOR ONLY ======
+export const getStudentsCount = () => apiClient.get("/api/users/count/students");
