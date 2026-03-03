@@ -3,9 +3,11 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 export default function ProfessorOnlyRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, booting } = useAuth();
 
-  if (loading) return null;
+  // Wait for auth to finish checking
+  if (booting) return null;
+
   if (!user) return <Navigate to="/auth" replace />;
 
   const roles = user.roles || [];
